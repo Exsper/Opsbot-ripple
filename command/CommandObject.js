@@ -43,15 +43,21 @@ class CommandObject {
 
 
 
-    async execute(osuApi, userOsuInfo, nedb, prefix, prefix2) {
+    async execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2) {
         const commandsInfo = new CommandsInfo(prefix, prefix2)
-        const msgPrefix = this.msg.substring(0,1);
+        const msgPrefix = this.msg.substring(0, 1);
         if ((msgPrefix !== commandsInfo.prefix) && (msgPrefix !== commandsInfo.prefix2)) return "";
         const commandString = this.msg.split(" ")[0].trim().substring(1);
         const argsString = this.getCommandArgsString(commandString);
         // 帮助
         if (commandString === "help") {
-            if (!argsString) return "基本指令：b/u/s/t/vs/vstop/bp/bbp/r/rrx/pr/prrx/set/unset/mode\n输入 " + commandsInfo.prefix + "help + 具体指令 来查看指令功能";
+            if (!argsString) {
+                let output = "基本指令：";
+                output = output + commandsInfo.apiCommands.reduce((acc, cur) => { return acc + cur.command[0] + "/" }, "");
+                output = output + commandsInfo.botCommands.reduce((acc, cur) => { return acc + cur.command[0] + "/" }, "");
+                output = output + "\n输入 " + commandsInfo.prefix + "help + 具体指令 来查看指令功能";
+                return output;
+            }
             let command = this.getCommandInfoFromApi(commandsInfo, argsString);
             if (!command.isCommand) command = this.getCommandInfoFromBot(commandsInfo, argsString);
             if (!command.isCommand) return "未实现的指令：" + argsString;
@@ -72,7 +78,7 @@ class CommandObject {
             let apiOptions = command.getApiOptions(argsString, userOsuInfo);
             if (command.isError) return command.getErrorMessage();
             let argObjects = apiOptions.getArgObjects();
-            return await new RunApiCommand().run(osuApi, command, argObjects);
+            return await new RunApiCommand().run(osuApi, rippleApi, command, argObjects);
         }
     }
 }

@@ -1,4 +1,4 @@
-const getUserData = require("../command/api/user/getUserData");
+const getUserData = require("../command/api/getUserData");
 const utils = require('../command/api/utils');
 
 class UserInfo {

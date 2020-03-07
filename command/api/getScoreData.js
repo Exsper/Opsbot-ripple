@@ -1,6 +1,6 @@
-const ScoreObject = require("./ScoreObject");
-const getBeatmapData = require("../beatmap/getBeatmapData");
-const utils = require('../utils');
+const ScoreObject = require("./objects/ScoreObject");
+const getBeatmapData = require("./getBeatmapData");
+const utils = require('./utils');
 
 
 class getScoreData {
@@ -53,7 +53,7 @@ class getScoreData {
     outputBeatmapAndScoresString(scoreObjects, beatmapObject) {
         let output = "";
         if (beatmapObject) {
-            if (scoreObjects[0].mode >= 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
+            if (scoreObjects[0].mode > 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
             else output = output + beatmapObject.toScoreTitle();
         }
         for (let i = 0, len = scoreObjects.length; i < len; i++) {
@@ -133,7 +133,7 @@ class getScoreData {
 
         let output = "";
         if (beatmapObject) {
-            if (scoreObjects[0].mode >= 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
+            if (scoreObjects[0].mode > 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
             else output = output + beatmapObject.toScoreTitle();
         }
         for (let i = 0, len = scoreObjects.length; i < len; i++) {
@@ -150,6 +150,19 @@ class getScoreData {
         }
         return output;
     }
+
+    outputRippleBeatmapAndScoresString(rippleScoreObjects) {
+        let rso = [];
+        if (Array.isArray(rippleScoreObjects)) rso = rippleScoreObjects;
+        else rso.push(rippleScoreObjects);
+        let output = "";
+        for (let i = 0, len = rso.length; i < len; i++) {
+            output = output + rso[i].beatmap.toScoreTitle(rso[i].getScoreModeString());
+            output = output + rso[i].toString();
+        }
+        return output;
+    }
+
 
 
 }

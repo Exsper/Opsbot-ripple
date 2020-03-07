@@ -1,4 +1,4 @@
-const UserObject = require("./UserObject");
+const UserObject = require("./objects/UserObject");
 
 
 class getUserData {

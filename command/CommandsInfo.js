@@ -13,7 +13,9 @@ function CommandsInfo(prefix = '$', prefix2 = '￥') {
         scoreVs: 'apiscoreVs',
         scoreVsTop: 'apiscoreVsTop',
         best: 'apibest',
+        bestRx: 'apibestRx',
         bestList: 'apibestList',
+        bestListRx: 'apibestListRx',
         recent: 'apirecent',
         recentRx: 'apirecentRx',
         recentPassed: 'apirecentPassed',
@@ -81,8 +83,18 @@ function CommandsInfo(prefix = '$', prefix2 = '￥') {
             reg: /^([0-9]+)([^:+#]+)?[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args + this.help.userName
         }, {
-            info: 'bp成绩查询',
-            command: ['bp', 'best', 'bpme'],
+            info: 'Relax模式指定bp成绩查询',
+            command: ['bprx', 'bestrx'],
+            type: this.apiType.bestRx,
+            //api: 'getUserBest',
+            argsInfo: '(user_id/"username")[#number](:mode)',
+            args: ['orgArgs', 'u', 'limit', 'm'],
+            argsFromUserInfo: [false, true, false, true],
+            reg: /^([^:+#]+)?[#]([0-9]+)[:：]?(.+)?/i,
+            note: this.help.args + this.help.userName
+        }, {
+            info: '指定bp成绩查询',
+            command: ['bp', 'best'],
             type: this.apiType.best,
             //api: 'getUserBest',
             argsInfo: '(user_id/"username")[#number](:mode)',
@@ -91,8 +103,18 @@ function CommandsInfo(prefix = '$', prefix2 = '￥') {
             reg: /^([^:+#]+)?[#]([0-9]+)[:：]?(.+)?/i,
             note: this.help.args + this.help.userName
         }, {
+            info: 'Relax模式bp列表查询',
+            command: ['bbprx', 'bestsrx', 'mybprx', 'bpmerx', 'rbq'],
+            type: this.apiType.bestListRx,
+            //api: 'getUserBest',
+            argsInfo: '(user_id/"username")(:mode)',
+            args: ['orgArgs', 'u', 'm'],
+            argsFromUserInfo: [false, true, true],
+            reg: /^([^:+#]+)?[:：]?(.+)?/i,
+            note: this.help.args + this.help.userName
+        }, {
             info: 'bp列表查询',
-            command: ['bbp', 'bests', 'mybp'],
+            command: ['bbp', 'bests', 'mybp', 'bpme'],
             type: this.apiType.bestList,
             //api: 'getUserBest',
             argsInfo: '(user_id/"username")(:mode)',
@@ -152,7 +174,7 @@ function CommandsInfo(prefix = '$', prefix2 = '￥') {
             info: '绑定osu账号',
             command: ['bind', 'set', 'setid'],
             type: this.botCommandType.bind,
-            argsInfo: '[user_id](:mode)',
+            argsInfo: '[user_id/"username"](:mode)',
             args: ['orgArgs', 'u', 'm'],
             argsFromUserInfo: [false, false, false],
             reg: /^([^:+#]+)[:：]?(.+)?/i,

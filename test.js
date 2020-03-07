@@ -3,6 +3,7 @@
 const UserInfo = require("./user/UserInfo");
 const CommandObject = require("./command/CommandObject");
 const OsuApi = require("./command/api/ApiRequest");
+const RippleApi = require("./command/api/RippleApiRequest");
 
 // 模拟meta
 console.log("你的QQ号是1了");
@@ -31,6 +32,7 @@ function next() {
 const prefix = "$";
 const prefix2 = "￥";
 const osuApi = new OsuApi();
+const rippleApi = new RippleApi();
 const nedb = require('./database/nedb')(__dirname + '/database/data/save.db');
 
 
@@ -59,7 +61,7 @@ async function run(meta, next) {
         let userInfo = new UserInfo(meta);
         let userOsuInfo = await userInfo.getUserOsuInfo(meta.userId, nedb);
         let commandObject = new CommandObject(meta, meta.message);
-        let reply = await commandObject.execute(osuApi, userOsuInfo, nedb, prefix, prefix2);
+        let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
         if (reply !== "") return meta.$send(reply);
         return next();
     } catch (ex) {

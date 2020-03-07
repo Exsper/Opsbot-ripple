@@ -1,4 +1,4 @@
-const BeatmapObject = require("./BeatmapObject");
+const BeatmapObject = require("./objects/BeatmapObject");
 
 
 class getBeatmapData {

@@ -11,44 +11,44 @@ class utils {
     // enabled_mods转为mods数组
     static getScoreMods(enabledMods) {
         let raw_mods = parseInt(enabledMods);
-        const Mods= {
-            'None'          : 0,
-            'NoFail'        : 1,
-            'Easy'          : 1 << 1,
-            'TouchDevice'   : 1 << 2,
-            'Hidden'        : 1 << 3,
-            'HardRock'      : 1 << 4,
-            'SuddenDeath'   : 1 << 5,
-            'DoubleTime'    : 1 << 6,
-            'Relax'         : 1 << 7,
-            'HalfTime'      : 1 << 8,
-            'Nightcore'     : 1 << 9, // DoubleTime
-            'Flashlight'    : 1 << 10,
-            'Autoplay'      : 1 << 11,
-            'SpunOut'       : 1 << 12,
-            'Relax2'        : 1 << 13, // Autopilot
-            'Perfect'       : 1 << 14, // SuddenDeath
-            'Key4'          : 1 << 15,
-            'Key5'          : 1 << 16,
-            'Key6'          : 1 << 17,
-            'Key7'          : 1 << 18,
-            'Key8'          : 1 << 19,
-            'FadeIn'        : 1 << 20,
-            'Random'        : 1 << 21,
-            'Cinema'        : 1 << 22,
-            'Target'        : 1 << 23,
-            'Key9'          : 1 << 24,
-            'KeyCoop'       : 1 << 25,
-            'Key1'          : 1 << 26,
-            'Key3'          : 1 << 27,
-            'Key2'          : 1 << 28,
-            'KeyMod'        : 521109504,
+        const Mods = {
+            'None': 0,
+            'NoFail': 1,
+            'Easy': 1 << 1,
+            'TouchDevice': 1 << 2,
+            'Hidden': 1 << 3,
+            'HardRock': 1 << 4,
+            'SuddenDeath': 1 << 5,
+            'DoubleTime': 1 << 6,
+            'Relax': 1 << 7,
+            'HalfTime': 1 << 8,
+            'Nightcore': 1 << 9, // DoubleTime
+            'Flashlight': 1 << 10,
+            'Autoplay': 1 << 11,
+            'SpunOut': 1 << 12,
+            'Relax2': 1 << 13, // Autopilot
+            'Perfect': 1 << 14, // SuddenDeath
+            'Key4': 1 << 15,
+            'Key5': 1 << 16,
+            'Key6': 1 << 17,
+            'Key7': 1 << 18,
+            'Key8': 1 << 19,
+            'FadeIn': 1 << 20,
+            'Random': 1 << 21,
+            'Cinema': 1 << 22,
+            'Target': 1 << 23,
+            'Key9': 1 << 24,
+            'KeyCoop': 1 << 25,
+            'Key1': 1 << 26,
+            'Key3': 1 << 27,
+            'Key2': 1 << 28,
+            'KeyMod': 521109504,
             'FreeModAllowed': 522171579,
             'ScoreIncreaseMods': 1049662
         };
-		let modsArr = [];
-		for (const mod in Mods) {
-			if (raw_mods & Mods[mod]) modsArr.push(mod);
+        let modsArr = [];
+        for (const mod in Mods) {
+            if (raw_mods & Mods[mod]) modsArr.push(mod);
         }
         return modsArr;
     }
@@ -181,7 +181,26 @@ class utils {
         else if (approved === "-2") return "graveyard";
         else return "未知";
     }
+    static getRippleRankedString(ranked) {
+        if (ranked === 5) return "loved";
+        else if (ranked === 4) return "qualified";
+        else if (ranked === 3) return "approved";
+        else if (ranked === 2) return "ranked";
+        else if (ranked === 1) return "需要更新";
+        else if (ranked === 0) return "pending";
+        else if (ranked === -1) return "未上传";
+        else return "未知";
+    }
 
+    // 将秒数转化为分钟：秒
+    static gethitLengthString(hitlength) {
+        const hl = parseInt(hitlength);
+        let min = Math.floor(hl / 60).toString();
+        let sec = Math.floor(hl % 60).toString();
+        if (min.length === 1) min = "0" + min;
+        if (sec.length === 1) sec = "0" + sec;
+        return min + ":" + sec;
+    }
 
 }
 

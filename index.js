@@ -3,6 +3,7 @@
 const UserInfo = require("./user/UserInfo");
 const CommandObject = require("./command/CommandObject");
 const OsuApi = require("./command/api/ApiRequest");
+const RippleApi = require("./command/api/RippleApiRequest");
 
 // Koishi插件名
 module.exports.name = "opsbot-ripple";
@@ -14,6 +15,7 @@ module.exports.apply = (ctx, config = {}) => {
 	const host = config.host || "osu.ppy.sb";
 
 	const osuApi = new OsuApi(host);
+	const rippleApi = new RippleApi(host);
 
 	// nedb保存userName
 	// 你说要保存stat记录？咕咕咕
@@ -25,7 +27,7 @@ module.exports.apply = (ctx, config = {}) => {
 			let userInfo = new UserInfo(meta);
 			let userOsuInfo = await userInfo.getUserOsuInfo(meta.userId, nedb);
 			let commandObject = new CommandObject(meta, meta.message);
-			let reply = await commandObject.execute(osuApi, userOsuInfo, nedb, prefix, prefix2);
+			let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
 			if (reply !== "") return meta.$send(`[CQ:at,qq=${qqId}]` + "\n" + reply);
 			return next();
 		} catch (ex) {

@@ -115,6 +115,7 @@ class RippleApi {
 	 */
     async getRecent(options) {
         let data = this.setIdOrName(options);
+        if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/recent', data);
         return resp;
@@ -126,6 +127,7 @@ class RippleApi {
 	 */
     async getRecentRx(options) {
         let data = this.setIdOrName(options);
+        if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/rxrecent', data);
         return resp;
@@ -137,6 +139,7 @@ class RippleApi {
 	 */
     async getBests(options) {
         let data = this.setIdOrName(options);
+        if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/best', data);
         return resp;
@@ -148,6 +151,7 @@ class RippleApi {
 	 */
     async getBestsRx(options) {
         let data = this.setIdOrName(options);
+        if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/rxbest', data);
         return resp;

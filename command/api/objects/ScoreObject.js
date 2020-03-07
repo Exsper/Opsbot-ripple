@@ -3,6 +3,7 @@ const utils = require('../utils');
 
 class ScoreObject {
     constructor(score) {
+        this.isRippleApi = false;
         // get_scores独有
         this.username = score.username || "";
         // get_user_recent/get_user_best独有
@@ -32,7 +33,7 @@ class ScoreObject {
 
     // 给转谱Score加上Score mode ("0", "1", "2", "3")
     addMode(scoreMode) {
-        this.mode = scoreMode;
+        this.mode = parseInt(scoreMode);
         return this;
     }
 

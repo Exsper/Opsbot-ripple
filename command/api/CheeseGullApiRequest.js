@@ -1,5 +1,5 @@
 
-// 只在beatmap指令用，其他指令需要获取谱面时还是用osu api
+// 只在search beatmap指令用，其他指令需要获取谱面时还是用osu api
 class CheeseGullApi {
     apiRequest(options) {
         return new Promise((resolve, reject) => {
