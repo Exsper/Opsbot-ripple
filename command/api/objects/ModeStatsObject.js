@@ -28,6 +28,18 @@ class ModeStatsObject {
 
         return output;
     }
+
+
+    compareTo(oldModeStats) {
+        const dAccuracy = this.accuracy - oldModeStats.accuracy;
+        const dPlaycount = this.playcount - oldModeStats.playcount;
+        const dLevel = this.level - oldModeStats.level;
+        const dCountryRank = this.countryRank - oldModeStats.countryRank;
+        const dRank = this.rank - oldModeStats.rank;
+        const dPP = this.pp - oldModeStats.pp;
+        const dRankedScores = this.rankedScores - oldModeStats.rankedScores;
+        const dPlay_time = this.play_time - oldModeStats.play_time;
+    }
 }
 
 
