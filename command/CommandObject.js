@@ -71,7 +71,7 @@ class CommandObject {
             else {
                 let argObjects = command.getBotOptions(argsString);
                 if (command.isError) return command.getErrorMessage();
-                return await new RunBotCommand().run(this.meta, osuApi, command, argObjects, nedb);
+                return await new RunBotCommand().run(this.meta, rippleApi, command, argObjects, nedb);
             }
         }
         else {

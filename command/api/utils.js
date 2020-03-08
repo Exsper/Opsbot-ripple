@@ -1,5 +1,13 @@
 class utils {
-
+    // 获取格式化游玩时长
+    static getUserTimePlayed(play_time) {
+        const s = parseInt(play_time);
+        const day = Math.floor(s / (24 * 3600)); // Math.floor()向下取整 
+        const hour = Math.floor((s - day * 24 * 3600) / 3600);
+        const minute = Math.floor((s - day * 24 * 3600 - hour * 3600) / 60);
+        const second = s - day * 24 * 3600 - hour * 3600 - minute * 60;
+        return day + "天" + hour + "时" + minute + "分" + second + "秒";
+    }
     // 整数每3位加逗号
     static format_number(n) {
         var b = parseInt(n).toString();

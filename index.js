@@ -13,13 +13,14 @@ module.exports.apply = (ctx, config = {}) => {
 	const prefix = config.prefix || "$";
 	const prefix2 = config.prefix2 || "￥";
 	const host = config.host || "osu.ppy.sb";
+	const database = config.database || __dirname + '/database/data/save.db';
 
 	const osuApi = new OsuApi(host);
 	const rippleApi = new RippleApi(host);
 
 	// nedb保存userName
 	// 你说要保存stat记录？咕咕咕
-	const nedb = require('./database/nedb')(__dirname + '/database/data/save.db');
+	const nedb = require('./database/nedb')(database);
 
 	ctx.middleware(async (meta, next) => {
 		try {

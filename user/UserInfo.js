@@ -25,22 +25,18 @@ class UserInfo {
         else return { qqId: qqId, osuId: -1, osuName: "", defaultMode: "" };
     }
 
-    async getOsuIdName(osuApi, osuInfo, mode = "0") {
-        let userData = await new getUserData().getUserObject(osuApi, { u: osuInfo, m: mode });
-        if (!userData) return null;
-        if (typeof userData === 'string') return null;
-        let userOsuInfo = {}
-        userOsuInfo.osuId = userData.userId;
-        userOsuInfo.osuName = userData.username;
-        return userOsuInfo;
+    async getOsuIdName(rippleApi, osuInfo) {
+        let userData = await new getUserData().getUserIdName(rippleApi, { u: osuInfo});
+        if (typeof userData === "string") return null; // 报错消息
+        return userData;
     }
 
-    async bindUser(osuApi, nedb, qqId, osuInfo, mode = "0") {
-        let userData = await this.getOsuIdName(osuApi, osuInfo, mode);
+    async bindUser(rippleApi, nedb, qqId, osuInfo, mode = "0") {
+        let userData = await this.getOsuIdName(rippleApi, osuInfo);
         if (!userData) return "无法获取到 " + osuInfo + " 的信息";
-        let bind = await this.dbInsertUser(nedb, qqId, userData.osuId, userData.osuName, mode);
-        if (!bind) return "与 " + userData.osuName + " 绑定失败";
-        else return "与 " + userData.osuName + " 绑定成功"
+        let bind = await this.dbInsertUser(nedb, qqId, userData.id, userData.username, mode);
+        if (!bind) return "与 " + userData.username + " 绑定失败";
+        else return "与 " + userData.username + " 绑定成功"
     }
     async unbindUser(nedb, qqId) {
         let unbind = this.dbRemoveUser(nedb, qqId);
@@ -48,28 +44,28 @@ class UserInfo {
         else return "解绑成功";
     }
 
-    async updateOsuId(osuApi, nedb, qqId, osuInfo, mode = "0") {
-        let userData = await this.getOsuIdName(osuApi, osuInfo, mode);
+    async updateOsuId(rippleApi, nedb, qqId, osuInfo, mode = "0") {
+        let userData = await this.getOsuIdName(rippleApi, osuInfo);
         if (!userData) return "无法获取到 " + osuInfo + " 的信息";
-        let numAffected = await nedb.update({ qqId: qqId }, { $set: { osuId: userData.osuId, osuName: userData.osuName } });
-        if (numAffected <= 0) return "绑定新账号" + userData.osuName + "失败";
+        let numAffected = await nedb.update({ qqId: qqId }, { $set: { osuId: userData.id, osuName: userData.username, defaultMode: mode } });
+        if (numAffected <= 0) return "绑定新账号" + userData.username + "失败";
         else {
             if (numAffected > 1) console.log("Warning: 设置了 " + numAffected + " 个 " + qqId + " 的osu账号信息")
-            return "绑定新账号" + userData.osuName + "成功";
+            return "绑定新账号" + userData.username + "成功";
         }
     }
 
-    async bind(osuApi, nedb, qqId, osuInfo, mode = "0") {
+    async bind(rippleApi, nedb, qqId, osuInfo, mode = "0") {
         mode = utils.getMode(mode);
         // 检查原先有没有记录
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
             // 更新记录
-            return await this.updateOsuId(osuApi, nedb, qqId, osuInfo, mode);
+            return await this.updateOsuId(rippleApi, nedb, qqId, osuInfo, mode);
         }
         else {
             // 新增记录
-            return await this.bindUser(osuApi, nedb, qqId, osuInfo, mode);
+            return await this.bindUser(rippleApi, nedb, qqId, osuInfo, mode);
         }
     }
 
