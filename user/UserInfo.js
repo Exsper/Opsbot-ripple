@@ -6,6 +6,7 @@ class UserInfo {
         this.userId = meta.userId;
     }
 
+    /*
     async dbInsertUser(nedb, qqId, osuId, osuName, defaultMode) {
         let newDoc = await nedb.insert({ qqId: qqId, osuId: osuId, osuName: osuName, defaultMode: defaultMode });
         if (newDoc) return true;
@@ -55,8 +56,10 @@ class UserInfo {
         }
     }
 
-    async bind(rippleApi, nedb, qqId, osuInfo, mode = "0") {
-        mode = utils.getMode(mode);
+    */
+
+    async bind(rippleApi, nedb, qqId, osuInfo, defaultMode = "0") {
+        let mode = parseInt(utils.getMode(defaultMode));
         // 检查原先有没有记录
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
