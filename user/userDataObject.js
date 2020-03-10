@@ -2,7 +2,7 @@ const getUserData = require("../command/api/getUserData");
 const UserObject = require("../command/api/objects/UserObject");
 
 class userDataObject {
-    constructor(qqId, oldUserJson, newUserJson, mode = 0) {
+    constructor(oldUserJson, newUserJson, mode = 0) {
         this.qqId = qqId;
         this.oldUserObject = (oldUserJson) ? new UserObject().init(oldUserJson) : "";
         this.newUserObject = (newUserJson) ? new UserObject().init(newUserJson) : "";
@@ -10,9 +10,12 @@ class userDataObject {
     }
 
     toData() {
-        return { qqId: this.qqId, oldUserObject: JSON.stringify(this.oldUserObject), newUserObject: JSON.stringify(this.newUserObject), mode: this.mode };
+        return { oldUserObject: JSON.stringify(this.oldUserObject), newUserObject: JSON.stringify(this.newUserObject), mode: this.mode };
     }
 
+
+
+    
     async updateUserObject(rippleApi, osuInfo) {
         let userObject = await new getUserData().getUserObject(rippleApi, osuInfo);
         if (typeof userObject === "string") return false; // 报错消息

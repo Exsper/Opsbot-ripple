@@ -6,14 +6,14 @@ const getBestScoresData = require("./api/getBestScoresData");
 const getRecentScoresData = require("./api/getRecentScoresData");
 
 class RunApiCommand {
-    async run(osuApi, rippleApi, command, argObjects) {
+    async run(osuApi, rippleApi, command, argObjects, nedb) {
         // 下达任务
         const commandsInfo = new CommandsInfo();
         if (command.commandType === commandsInfo.apiType.beatmap)
             return await new getBeatmapData().outputBeatmap(osuApi, argObjects[0]);
 
         else if (command.commandType === commandsInfo.apiType.user)
-            return await new getUserData().outputUser(rippleApi, argObjects[0]);
+            return await new getUserData().outputUser(rippleApi, argObjects[0], nedb);
 
         else if ((command.commandType === commandsInfo.apiType.score) || (command.commandType === commandsInfo.apiType.scoreVs))
             return await new getScoreData().outputScores(osuApi, argObjects);

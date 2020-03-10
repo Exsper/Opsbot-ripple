@@ -78,7 +78,7 @@ class CommandObject {
             let apiOptions = command.getApiOptions(argsString, userOsuInfo);
             if (command.isError) return command.getErrorMessage();
             let argObjects = apiOptions.getArgObjects();
-            return await new RunApiCommand().run(osuApi, rippleApi, command, argObjects);
+            return await new RunApiCommand().run(osuApi, rippleApi, command, argObjects, nedb);
         }
     }
 }

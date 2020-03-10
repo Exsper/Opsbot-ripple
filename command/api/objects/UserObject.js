@@ -54,6 +54,10 @@ class UserObject {
         output = output + "对比：" + oldUserObject.recordDate.toLocaleString();
         return output;
     }
+
+    toJson() {
+        return JSON.stringify(this);
+    }
 }
 
 
