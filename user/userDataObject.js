@@ -2,37 +2,36 @@ const getUserData = require("../command/api/getUserData");
 const UserObject = require("../command/api/objects/UserObject");
 
 class userDataObject {
-    constructor(oldUserJson, newUserJson, mode = 0) {
+    constructor(afterUserObjectJson, beforeUserObjectJson, qqId = "", defaultMode = "0") {
+        this.userId = afterUserObject.userId;
+        this.userName = afterUserObject.username;
+        this.afterUserObject = (afterUserObjectJson) ? new UserObject().init(afterUserObjectJson) : "";
+        this.beforeUserObject = (beforeUserObjectJson) ? new UserObject().init(beforeUserObjectJson) : "";
         this.qqId = qqId;
-        this.oldUserObject = (oldUserJson) ? new UserObject().init(oldUserJson) : "";
-        this.newUserObject = (newUserJson) ? new UserObject().init(newUserJson) : "";
-        this.mode = mode;
+        this.defaultMode = defaultMode;
     }
 
     toData() {
-        return { oldUserObject: JSON.stringify(this.oldUserObject), newUserObject: JSON.stringify(this.newUserObject), mode: this.mode };
+        return { userId: this.userId, userName: this.userName, qqId:this.qqId, data: JSON.stringify(this) };
     }
 
-
-
-    
-    async updateUserObject(rippleApi, osuInfo) {
+    async initUserObject(osuInfo) {
         let userObject = await new getUserData().getUserObject(rippleApi, osuInfo);
         if (typeof userObject === "string") return false; // 报错消息
-        if (this.oldUserObject === "" && this.newUserObject === "") {
-            this.oldUserObject = userObject;
-            this.newUserObject = userObject;
-            this.mode = osuInfo.m || userObject.favourite_mode;
-            return true;
-        }
-        // userObject与newUserObject同一天，更新newUserObject
-        if (userObject.toDateString() === newUserObject.toDateString()) this.newUserObject = userObject;
-        // userObject与newUserObject不为同一天
-        else {
-            this.oldUserObject = this.newUserObject;
-            this.newUserObject = userObject;
-        }
+        this.afterUserObject = userObject;
+        this.beforeUserObjectJson = userObject;
+        this.defaultMode = osuInfo.m || userObject.favourite_mode;
         return true;
+    }
+
+    updateUserObject(newUserObject) {
+        // afterUserObject与newUserObject同一天，更新afterUserObject
+        if (afterUserObject.toDateString() === newUserObject.toDateString()) this.afterUserObject = newUserObject;
+        // afterUserObject与newUserObject不为同一天，冒泡
+        else {
+            this.beforeUserObject = this.afterUserObject;
+            this.afterUserObject = newUserObject;
+        }
     }
 
 }

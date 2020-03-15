@@ -1,5 +1,5 @@
 const UserObject = require("./objects/UserObject");
-const UserInfo = require(".../user/UserInfo");
+const UserInfo = require("../../user/UserInfo");
 
 
 class getUserData {

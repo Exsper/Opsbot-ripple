@@ -1,9 +1,22 @@
 const getUserData = require("../command/api/getUserData");
 const utils = require('../command/api/utils');
 
+
 class UserInfo {
-    constructor(meta) {
-        this.userId = meta.userId;
+    async getUserDataByQQId(nedb, _qqId){
+        let res = await nedb.findOne({ qqId: _qqId });
+        if (res) return res.data;
+        else return null;
+    }
+    async getUserDataByUserId(nedb, _userId){
+        let res = await nedb.findOne({ userId: _userId });
+        if (res) return res.data;
+        else return null;
+    }
+    async getUserDataByUserName(nedb, _userName){
+        let res = await nedb.findOne({ userName: _userName });
+        if (res) return res.data;
+        else return null;
     }
 
     /*
