@@ -1,6 +1,6 @@
-const UserObject = require("../command/api/objects/UserObject");
-const getUserData = require("../command/api/getUserData");
-const utils = require('../command/api/utils');
+const UserObject = require("./objects/UserObject");
+const getUserData = require("./getUserData");
+const utils = require('./utils');
 
 // 记录内容：
 // userId, userName, beforeUserObject, afterUserObject, (qqId), (defaultMode), _Id(db自带)

@@ -10,10 +10,10 @@ module.exports.name = "opsbot-ripple";
 
 // 插件处理和输出
 module.exports.apply = (ctx, config = {}) => {
-	const prefix = config.prefix || "$";
-	const prefix2 = config.prefix2 || "￥";
+	const prefix = config.prefix || "%";
+	const prefix2 = config.prefix2 || "*";
 	const host = config.host || "osu.ppy.sb";
-	const database = config.database || __dirname + '/database/data/save.db';
+	const database = config.database || '../../Opsbot-Ripple-v1.db';
 
 	const osuApi = new OsuApi(host);
 	const rippleApi = new RippleApi(host);
@@ -25,8 +25,7 @@ module.exports.apply = (ctx, config = {}) => {
 	ctx.middleware(async (meta, next) => {
 		try {
 			const qqId = meta.userId;
-			let userInfo = new UserInfo(meta);
-			let userOsuInfo = await userInfo.getUserOsuInfo(meta.userId, nedb);
+			let userOsuInfo = await UserInfo.getUserOsuInfo(meta.userId, nedb);
 			let commandObject = new CommandObject(meta, meta.message);
 			let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
 			if (reply !== "") return meta.$send(`[CQ:at,qq=${qqId}]` + "\n" + reply);

@@ -51,6 +51,20 @@ class ModeStatsObject {
         else return "\n";
     }
 
+    addCompareRankedScores(nowValue, oldValue) {
+        let delta = nowValue - oldValue;
+        if (delta > 0) return " \t ( +" + utils.format_number(delta) + " )\n";
+        else if (delta < 0) return " \t ( " + utils.format_number(delta) + " )\n";
+        else return "\n";
+    }
+
+    addCompareUserTimePlayed(nowValue, oldValue) {
+        let delta = nowValue - oldValue;
+        if (delta > 0) return " \t ( +" + utils.getUserTimePlayed(delta) + " )\n";
+        else if (delta < 0) return " \t ( " + utils.getUserTimePlayed(delta) + " )\n";
+        else return "\n";
+    }
+
 
     /**
      * @param {ModeStatsObject} oldModeStats
@@ -62,8 +76,8 @@ class ModeStatsObject {
         const dCountryRank = this.addCompareString(this.countryRank, oldModeStats.countryRank);
         const dRank = this.addCompareString(this.rank, oldModeStats.rank);
         const dPP = this.addCompareString(this.pp, oldModeStats.pp);
-        const dRankedScores = utils.format_number(this.addCompareString(this.rankedScores, oldModeStats.rankedScores));
-        const dPlay_time = utils.getUserTimePlayed(this.addCompareString(this.play_time, oldModeStats.play_time));
+        const dRankedScores = this.addCompareRankedScores(this.rankedScores, oldModeStats.rankedScores);
+        const dPlay_time = this.addCompareUserTimePlayed(this.play_time, oldModeStats.play_time);
 
         let output = "";
         output = output + "acc：" + this.accuracy + "%" + dAccuracy;

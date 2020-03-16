@@ -115,8 +115,8 @@ class getScoreData {
         const yourScoreObjects = await this.getScoreObjects(osuApi, argObject);
         if (typeof yourScoreObjects === "string") return yourScoreObjects; // 报错消息
         scoreObjects.push(yourScoreObjects[0]);
-        let yourPP = yourScoreObject.pp;
-        let yourName = yourScoreObject.username;
+        let yourPP = yourScoreObjects[0].pp;
+        let yourName = yourScoreObjects[0].username;
 
         let topArgObject = argObject;
         topArgObject.limit = 1;
@@ -124,8 +124,8 @@ class getScoreData {
         const topScoreObjects = await this.getScoreObject(osuApi, topArgObject);
         if (typeof topScoreObjects === "string") return topScoreObjects; // 报错消息
         scoreObjects.push(topScoreObjects[0]);
-        let topPP = topScoreObject.pp;
-        let topName = topScoreObject.username;
+        let topPP = topScoreObjects[0].pp;
+        let topName = topScoreObjects[0].username;
 
         const scoreBeatmapData = await this.getScoreBeatmapData(osuApi, scoreObjects, argObject);
         scoreObjects = scoreBeatmapData.scoreObjects;

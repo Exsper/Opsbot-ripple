@@ -1,5 +1,5 @@
 const UserObject = require("./objects/UserObject");
-const UserInfo = require("../../user/UserInfo");
+const UserInfo = require("./UserInfo");
 
 
 class getUserData {
@@ -9,14 +9,18 @@ class getUserData {
         if (rippleUser.code === "error") return "获取玩家出错 " + JSON.stringify(argObject) + "\n";
         let userObject = new UserObject(rippleUser);
         // 存储userObject
-        // TODO
+        let temp = await UserInfo.saveUserObject(nedb, userObject);
         return userObject;
     }
 
     async outputUser(rippleApi, argObject, nedb) {
         let rippleUser = await this.getUserObject(rippleApi, argObject, nedb);
+        if (typeof rippleUser === "string") return "无法获取到 " + argObject.u + " 的信息"; // 报错消息
         let mode = (argObject.m) ? argObject.m : undefined;
-        return rippleUser.toString(mode);
+        // return rippleUser.toString(mode);
+        // 从数据库里寻找beforeUserInfo
+        let beforeUserInfo = await UserInfo.getBeforeUserObject(nedb, rippleUser.userId);
+        return rippleUser.tocompareString(beforeUserInfo, mode);
     }
 
     async getUserIdName(rippleApi, argObject) {

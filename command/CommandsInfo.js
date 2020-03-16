@@ -1,4 +1,4 @@
-function CommandsInfo(prefix = '$', prefix2 = '￥') {
+function CommandsInfo(prefix, prefix2) {
     this.prefix = prefix;
     this.prefix2 = prefix2;
     this.help = {
@@ -154,7 +154,7 @@ function CommandsInfo(prefix = '$', prefix2 = '￥') {
             note: this.help.args + this.help.userName
         }, {
             info: '获取最近成绩（不包括未pass成绩）',
-            command: ['pr'],
+            command: ['pr', 'prsb'],
             type: this.apiType.recentPassed,
             //api: 'getUserRecent',
             argsInfo: '(user_id/"username")(:mode)',

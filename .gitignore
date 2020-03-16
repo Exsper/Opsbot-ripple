@@ -13,7 +13,6 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-database/data/save.db
 
 # Build results
 [Dd]ebug/
@@ -342,3 +341,4 @@ ASALocalRun/
 healthchecksdb
 
 
+database/save.db

@@ -5,11 +5,11 @@ class RunBotCommand {
         // 下达任务
         const commandsInfo = new CommandsInfo();
         if (command.commandType === commandsInfo.botCommandType.bind)
-            return await new UserInfo(meta).bind(rippleApi, nedb, meta.userId, argObjects.u, argObjects.m);
+            return await new UserInfo(meta).bindUser(rippleApi, nedb, meta.userId, argObjects);
         else if (command.commandType === commandsInfo.botCommandType.unbind)
-            return await new UserInfo(meta).unbind(rippleApi, meta.userId);
+            return await new UserInfo(meta).unbindUser(rippleApi, meta.userId);
         else if (command.commandType === commandsInfo.botCommandType.mode)
-            return await new UserInfo(meta).mode(nedb, meta.userId, argObjects.m);
+            return await new UserInfo(meta).setMode(nedb, meta.userId, argObjects.m);
         else return ""; // 未知指令
     }
 }

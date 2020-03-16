@@ -19,17 +19,18 @@ class UserObject {
     }
 
     init(userObjectJson) {
-        this.userId = userObjectJson.userId;
-        this.username = userObjectJson.username;
-        this.username_aka = userObjectJson.username_aka;
+        let thisUserObject = JSON.parse(userObjectJson);
+        this.userId = thisUserObject.userId;
+        this.username = thisUserObject.username;
+        this.username_aka = thisUserObject.username_aka;
         this.modeStats = [];
-        this.modeStats[0] = new ModeStatsObject().init(userObjectJson.modeStats[0]);
-        this.modeStats[1] = new ModeStatsObject().init(userObjectJson.modeStats[1]);
-        this.modeStats[2] = new ModeStatsObject().init(userObjectJson.modeStats[2]);
-        this.modeStats[3] = new ModeStatsObject().init(userObjectJson.modeStats[3]);
-        this.favourite_mode = userObjectJson.favourite_mode;
+        this.modeStats[0] = new ModeStatsObject().init(thisUserObject.modeStats[0]);
+        this.modeStats[1] = new ModeStatsObject().init(thisUserObject.modeStats[1]);
+        this.modeStats[2] = new ModeStatsObject().init(thisUserObject.modeStats[2]);
+        this.modeStats[3] = new ModeStatsObject().init(thisUserObject.modeStats[3]);
+        this.favourite_mode = thisUserObject.favourite_mode;
 
-        this.recordDate = userObjectJson.recordDate;
+        this.recordDate = new Date(thisUserObject.recordDate);
         return this;
     }
 
@@ -57,6 +58,10 @@ class UserObject {
 
     toJson() {
         return JSON.stringify(this);
+    }
+
+    getDateString() {
+        return this.recordDate.toDateString();
     }
 }
 

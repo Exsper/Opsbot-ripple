@@ -29,11 +29,11 @@ function next() {
 }
 
 
-const prefix = "$";
-const prefix2 = "￥";
+const prefix = "%";
+const prefix2 = "*";
 const osuApi = new OsuApi();
 const rippleApi = new RippleApi();
-const nedb = require('./database/nedb')(__dirname + '/database/data/save.db');
+const nedb = require('./database/nedb')(__dirname + '/database/save.db');
 
 
 let myQQ = "1";
@@ -58,8 +58,7 @@ rl.on("line", (line) => {
 
 async function run(meta, next) {
     try {
-        let userInfo = new UserInfo(meta);
-        let userOsuInfo = await userInfo.getUserOsuInfo(meta.userId, nedb);
+        let userOsuInfo = await UserInfo.getUserOsuInfo(meta.userId, nedb);
         let commandObject = new CommandObject(meta, meta.message);
         let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
         if (reply !== "") return meta.$send(reply);

@@ -1,6 +1,8 @@
 # Opsbot-ripple
 koishi based qq-bot plugin for ripple based osu! server
 
+不知道为什么UserInfo不复制一份就会出错
+
 ## install
 ```sh
 npm install Exsper/Opsbot-ripple
