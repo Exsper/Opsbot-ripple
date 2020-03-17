@@ -13,7 +13,7 @@ module.exports.apply = (ctx, config = {}) => {
 	const prefix = config.prefix || "%";
 	const prefix2 = config.prefix2 || "*";
 	const host = config.host || "osu.ppy.sb";
-	const database = config.database || '../../Opsbot-Ripple-v1.db';
+	const database = config.database || './Opsbot-Ripple-v1.db';
 
 	const osuApi = new OsuApi(host);
 	const rippleApi = new RippleApi(host);
