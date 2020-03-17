@@ -41,13 +41,17 @@ class Command {
             return new ApiOptions();
         }
         let args = {};
+        let me = false;
         for (let i = 1; i < mr.length; ++i) {
             let key = this.commandInfo.args[i];
             if (mr[i] === undefined || mr[i] === "null" || mr[i].trim() === "") {
                 if (!this.commandInfo.argsFromUserInfo[i]) continue;
                 let value = "";
-                if (userOsuInfo.osuId > 0 && this.commandInfo.args[i] === "u") value = userOsuInfo.osuId;
-                else if (userOsuInfo.defaultMode && this.commandInfo.args[i] === "m") value = userOsuInfo.defaultMode;
+                if (userOsuInfo.osuId > 0 && this.commandInfo.args[i] === "u") {
+                    me = true; // 当me = true时才适用defaultMode
+                    value = userOsuInfo.osuId;
+                }
+                else if (userOsuInfo.defaultMode && this.commandInfo.args[i] === "m" && me) value = userOsuInfo.defaultMode;
                 else continue;
                 Object.assign(args, { [key]: value });
             }

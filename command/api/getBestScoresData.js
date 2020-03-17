@@ -4,7 +4,8 @@ const getScoreData = require("./getScoreData");
 class getBestScoresData {
     async getBestScoresObject(rippleApi, argObject, isRelax = false) {
         const result = (isRelax) ? await rippleApi.getBestsRx(argObject) : await rippleApi.getBests(argObject);
-        if (result.code === "404") return "找不到成绩 " + JSON.stringify(argObject) + "\n";
+        if (result.code === 404) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
+        if (result.code === 400) return "必须指定玩家名或Id（或先绑定私服账户）\n";
         if (result.code === "error") return "获取成绩出错 " + JSON.stringify(argObject) + "\n";
         let scores = result.scores;
         if ((!Array.isArray(scores)) || (scores.length <= 0)) return "找不到成绩 " + JSON.stringify(argObject) + "\n";

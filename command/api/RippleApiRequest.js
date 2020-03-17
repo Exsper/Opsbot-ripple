@@ -47,7 +47,7 @@ class RippleApi {
             host: this.host
         }).then(data => {
             try {
-                if (!data || data === "null") return { code: "404" };
+                if (!data || data === "null") return { code: 404 };
                 return JSON.parse(data);
             }
             catch (ex) {

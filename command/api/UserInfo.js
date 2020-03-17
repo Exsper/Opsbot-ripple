@@ -1,6 +1,6 @@
-const UserObject = require("../command/api/objects/UserObject");
-const getUserData = require("../command/api/getUserData");
-const utils = require('../command/api/utils');
+const UserObject = require("./objects/UserObject");
+const getUserData = require("./getUserData");
+const utils = require('./utils');
 
 // 记录内容：
 // userId, userName, beforeUserObject, afterUserObject, (qqId), (defaultMode), _Id(db自带)
@@ -68,7 +68,6 @@ class UserInfo {
                 output = output + "，默认模式设置为" + utils.getModeString(osuInfo.m);
                 await nedb.update({ userId: userId }, { $set: { defaultMode: osuInfo.m } });
             }
-            else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
             return output;
         }
         return output + "数据库出错惹！";

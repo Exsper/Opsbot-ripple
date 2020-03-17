@@ -5,8 +5,13 @@ class utils {
         const day = Math.floor(s / (24 * 3600)); // Math.floor()向下取整 
         const hour = Math.floor((s - day * 24 * 3600) / 3600);
         const minute = Math.floor((s - day * 24 * 3600 - hour * 3600) / 60);
-        const second = s - day * 24 * 3600 - hour * 3600 - minute * 60;
-        return day + "天" + hour + "时" + minute + "分" + second + "秒";
+        // const second = s - day * 24 * 3600 - hour * 3600 - minute * 60;
+        let output = "";
+        if (day > 0) output = output + day + "天";
+        if (hour > 0) output = output + hour + "小时";
+        if (minute > 0) output = output + minute + "分";
+        // if (second>0) output = output + second + "秒";
+        return output;
     }
     // 整数每3位加逗号
     static format_number(n) {
@@ -171,6 +176,7 @@ class utils {
     }
     // mode转string
     static getModeString(mode) {
+        if (mode !== 0 && mode !== "0" && !mode) return "当你看到这条信息说明代码有漏洞惹";
         let modeString = mode.toString();
         if (modeString === "0") return "Standard";
         else if (modeString === "1") return "Taiko";

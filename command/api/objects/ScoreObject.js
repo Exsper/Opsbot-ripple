@@ -88,6 +88,18 @@ class ScoreObject {
         return name + comboString + accString + utils.format_number(this.score) + "\t " + this.rank + "\t | " + modsString + "\t " + ppString + "\n";
     }
 
+    toCompleteString() {
+        const name = (!this.username) ? "" : "玩家：" + this.username + "\n";
+        const comboString = (this.beatmapMaxcombo < 0) ? "combo: " + this.maxcombo + "\n" : "combo: " + this.maxcombo + "/" + this.beatmapMaxcombo + "\n";
+        const accString = (this.acc < 0) ? "" : "ACC：" + (this.acc * 100).toFixed(2) + "%\n";
+        const modsString = "mod：" + utils.getScoreModsString(this.mods) + "\n";
+        const rankString = "rank：" + this.rank + "\n";
+        const ppString = (this.pp === "0") ? "" : "pp：" + this.pp + "pp\n";
+        const scoreString = "分数：" + utils.format_number(this.score) + "\n";
+        const missCount = (this.countmiss <= 0) ? "" : "miss：" + this.score + "\n";
+        return name + comboString + accString + modsString + rankString + ppString + scoreString + missCount;
+    }
+
 }
 
 module.exports = ScoreObject;

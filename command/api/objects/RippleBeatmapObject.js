@@ -43,8 +43,17 @@ class RippleBeatmapObject {
         return output;
     }
 
-    toScoreTitle(scoreModeString = this.beatmapMode) {
-        return "谱面 " + this.beatmapId + " " + this.songName + " 的" + scoreModeString + "成绩：\n";
+    toScoreTitle(scoreModeString) {
+        let diff = "";
+        if (!scoreModeString) diff = " ★" + this.difficulty;
+        else {
+            let mode = utils.getMode(scoreModeString);
+            if (mode === "0") diff = " ★" + this.difficulty2.std;
+            if (mode === "1") diff = " ★" + this.difficulty2.taiko;
+            if (mode === "2") diff = " ★" + this.difficulty2.ctb;
+            if (mode === "3") diff = " ★" + this.difficulty2.mania;
+        }
+        return "谱面 " + this.beatmapId + " " + this.songName + diff + " 的" + scoreModeString + "成绩：\n";
     }
 }
 

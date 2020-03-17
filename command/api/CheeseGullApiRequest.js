@@ -42,7 +42,7 @@ class CheeseGullApi {
             data: _data
         }).then(data => {
             try {
-                if (!data || data === "null") return { code: "404" };
+                if (!data || data === "null") return { code: 404 };
                 return JSON.parse(data);
             }
             catch (ex) {

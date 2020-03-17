@@ -6,7 +6,7 @@ const utils = require('./utils');
 class getScoreData {
     async getScoreObjects(osuApi, argObject) {
         const scores = await osuApi.getScores(argObject);
-        if (scores.code === "404") return "找不到成绩 " + JSON.stringify(argObject) + "\n";
+        if (scores.code === 404) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
         if (scores.code === "error") return "获取成绩出错 " + JSON.stringify(argObject) + "\n";
         if (scores.length <= 0) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
         let scoreObjects = scores.map(item => { return new ScoreObject(item); });
@@ -115,8 +115,8 @@ class getScoreData {
         const yourScoreObjects = await this.getScoreObjects(osuApi, argObject);
         if (typeof yourScoreObjects === "string") return yourScoreObjects; // 报错消息
         scoreObjects.push(yourScoreObjects[0]);
-        let yourPP = yourScoreObject.pp;
-        let yourName = yourScoreObject.username;
+        let yourPP = yourScoreObjects[0].pp;
+        let yourName = yourScoreObjects[0].username;
 
         let topArgObject = argObject;
         topArgObject.limit = 1;
@@ -124,8 +124,8 @@ class getScoreData {
         const topScoreObjects = await this.getScoreObject(osuApi, topArgObject);
         if (typeof topScoreObjects === "string") return topScoreObjects; // 报错消息
         scoreObjects.push(topScoreObjects[0]);
-        let topPP = topScoreObject.pp;
-        let topName = topScoreObject.username;
+        let topPP = topScoreObjects[0].pp;
+        let topName = topScoreObjects[0].username;
 
         const scoreBeatmapData = await this.getScoreBeatmapData(osuApi, scoreObjects, argObject);
         scoreObjects = scoreBeatmapData.scoreObjects;
@@ -158,7 +158,8 @@ class getScoreData {
         let output = "";
         for (let i = 0, len = rso.length; i < len; i++) {
             output = output + rso[i].beatmap.toScoreTitle(rso[i].getScoreModeString());
-            output = output + rso[i].toString();
+            //output = output + rso[i].toString();
+            output = output + rso[i].toCompleteString();
         }
         return output;
     }
