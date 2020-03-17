@@ -36,7 +36,7 @@ class BeatmapObject {
     }
 
     toScoreTitle(scoreModeString = this.beatmapMode) {
-        return "谱面 " + this.beatmapId + " " + this.artist + " - " + this.title + "[" + this.diff + "] " + " 的" + scoreModeString + "成绩：\n";
+        return "谱面 " + this.beatmapId + " " + this.artist + " - " + this.title + "[" + this.diff + "] " + " ★" + this.stars + " 的" + scoreModeString + "成绩：\n";
     }
 }
 

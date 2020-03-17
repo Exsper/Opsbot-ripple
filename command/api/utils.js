@@ -176,6 +176,7 @@ class utils {
     }
     // mode转string
     static getModeString(mode) {
+        if (!mode) return "当你看到这条信息说明代码有漏洞惹";
         let modeString = mode.toString();
         if (modeString === "0") return "Standard";
         else if (modeString === "1") return "Taiko";

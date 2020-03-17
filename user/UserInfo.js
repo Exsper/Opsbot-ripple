@@ -52,7 +52,7 @@ class UserInfo {
             await nedb.update({ qqId: qqId }, { $unset: { qqId: true, defaultMode: true } });
         }
         let userObject = await new getUserData().getUserObject(rippleApi, osuInfo, nedb);
-        if (typeof userObject === "string") return "无法获取到 " + osuInfo.u + " 的信息"; // 报错消息
+        if (typeof userObject === "string") return userObject; // 报错消息
         // 这时数据库已记录该玩家，添加qqId字段即可
         // 检查该玩家是否已被绑定其他玩家
         let userId = userObject.userId;
@@ -68,6 +68,7 @@ class UserInfo {
                 output = output + "，默认模式设置为" + utils.getModeString(osuInfo.m);
                 await nedb.update({ userId: userId }, { $set: { defaultMode: osuInfo.m } });
             }
+            else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
             return output;
         }
         return output + "数据库出错惹！";

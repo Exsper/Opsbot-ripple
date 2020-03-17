@@ -6,7 +6,7 @@ const utils = require('./utils');
 class getScoreData {
     async getScoreObjects(osuApi, argObject) {
         const scores = await osuApi.getScores(argObject);
-        if (scores.code === "404") return "找不到成绩 " + JSON.stringify(argObject) + "\n";
+        if (scores.code === 404) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
         if (scores.code === "error") return "获取成绩出错 " + JSON.stringify(argObject) + "\n";
         if (scores.length <= 0) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
         let scoreObjects = scores.map(item => { return new ScoreObject(item); });
@@ -158,7 +158,8 @@ class getScoreData {
         let output = "";
         for (let i = 0, len = rso.length; i < len; i++) {
             output = output + rso[i].beatmap.toScoreTitle(rso[i].getScoreModeString());
-            output = output + rso[i].toString();
+            //output = output + rso[i].toString();
+            output = output + rso[i].toCompleteString();
         }
         return output;
     }
