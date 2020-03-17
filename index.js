@@ -18,8 +18,7 @@ module.exports.apply = (ctx, config = {}) => {
 	const osuApi = new OsuApi(host);
 	const rippleApi = new RippleApi(host);
 
-	// nedb保存userName
-	// 你说要保存stat记录？咕咕咕
+	// nedb
 	const nedb = require('./database/nedb')(database);
 
 	ctx.middleware(async (meta, next) => {

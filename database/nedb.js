@@ -5,6 +5,7 @@ function DB(database) {
         autoload: true,
     };
     this.db = new Datastore(options);
+    this.db.persistence.setAutocompactionInterval(10 * 60 * 1000); // 每10分钟压缩一次
 }
 DB.prototype.limit = function (offset, limit) {
     this.offset = offset || 0;

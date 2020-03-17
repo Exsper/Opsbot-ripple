@@ -6,7 +6,9 @@ const RunBotCommand = require("./RunBotCommand");
 class CommandObject {
     constructor(meta, msg) {
         this.meta = meta;
-        this.msg = msg.trim();
+        this.msg = msg.trim().replace(/&#(x)?(\w+);/g, function($, $1, $2) {
+            return String.fromCharCode(parseInt($2, $1? 16: 10));
+        });
         this.apiClass = "api";
         this.botClass = "bot";
     }
