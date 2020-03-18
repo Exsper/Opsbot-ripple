@@ -52,8 +52,12 @@ class RippleScoreObject {
         const rankString = "rank：" + this.rank + "\n";
         const ppString = (this.pp === 0) ? "" : "pp：" + this.pp + "pp\n";
         const scoreString = "分数：" + utils.format_number(this.score) + "\n";
-        const missCount = (this.countmiss <= 0) ? "" : "miss：" + this.countmiss + "\n";
-        return name + comboString + accString + modsString + rankString + ppString + scoreString + missCount;
+        const count300String = (this.count300 <= 0) ? "" : "300：" + this.count300 + "  ";
+        const count100String = (this.count100 <= 0) ? "" : "100：" + this.count100 + "  ";
+        const count50String = (this.count50 <= 0) ? "" : "50：" + this.count50 + "  ";
+        const countMissString = (this.countmiss <= 0) ? "" : "miss：" + this.countmiss;
+        const hitCountString = count300String + count100String + count50String + countMissString;
+        return name + comboString + accString + modsString + rankString + ppString + scoreString + hitCountString;
     }
 
 }
