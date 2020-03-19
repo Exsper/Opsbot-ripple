@@ -13,7 +13,7 @@ class apiOptions {
         let argObject = {};
         if (singlebeatmap) argObject.b = singlebeatmap;
         if (singleuser) {
-            if ((singleuser.legnth > 4) && (singleuser.substring(0, 1) === "\"") && (singleuser.substring(singleuser.length - 1) === "\"")) {
+            if ((singleuser.length > 4) && (singleuser.substring(0, 1) === "\"") && (singleuser.substring(singleuser.length - 1) === "\"")) {
                 // 带引号强制字符串形式
                 argObject.u = singleuser.substring(1, singleuser.length - 1);
                 argObject.type = 'string';
