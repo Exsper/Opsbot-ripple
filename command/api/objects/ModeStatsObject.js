@@ -46,8 +46,8 @@ class ModeStatsObject {
     addCompareString(nowValue, oldValue, digits = 0) {
         const multiplier = Math.pow(10, digits);
         let delta = (nowValue * multiplier - oldValue * multiplier) / multiplier;
-        if (delta > 0) return " \t ( +" + delta + " )\n";
-        else if (delta < 0) return " \t ( " + delta + " )\n";
+        if (delta > 0) return " \t ( +" + delta.toFixed(digits) + " )\n";
+        else if (delta < 0) return " \t ( " + delta.toFixed(digits) + " )\n";
         else return "\n";
     }
 
