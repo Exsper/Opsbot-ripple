@@ -33,7 +33,7 @@ class ModeStatsObject {
         output = output + "acc：" + this.accuracy + "%\n";
         output = output + "等级：" + this.level + "\n";
         output = output + "pp：" + this.pp + "\n";
-        output = output + "全服排名：" + this.rank + "\n";
+        output = output + "全服排名：#" + this.rank + "\n";
         //output = output + "本地排名：" + this.countryRank + "\n";
         output = output + "游玩次数：" + this.playcount + "\n";
         output = output + "rank总分：" + utils.format_number(this.rankedScores) + "\n";
@@ -72,7 +72,6 @@ class ModeStatsObject {
         else return "\n";
     }
 
-
     /**
      * @param {ModeStatsObject} oldModeStats
      */
@@ -90,7 +89,7 @@ class ModeStatsObject {
         output = output + "acc：" + this.accuracy + "%" + dAccuracy;
         output = output + "等级：" + this.level + dLevel;
         output = output + "pp：" + this.pp + dPP;
-        output = output + "全服排名：" + this.rank + dRank;
+        output = output + "全服排名：#" + this.rank + dRank;
         //output = output + "本地排名：" + this.countryRank + dCountryRank;
         output = output + "游玩次数：" + this.playcount + dPlaycount;
         output = output + "rank总分：" + utils.format_number(this.rankedScores) + dRankedScores;
