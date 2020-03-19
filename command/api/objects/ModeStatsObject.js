@@ -7,11 +7,11 @@ class ModeStatsObject {
             this.accuracy = parseFloat(modeStats.accuracy.toFixed(4));
             this.playcount = modeStats.playcount;
             this.level = parseFloat(modeStats.level.toFixed(2));
-            this.countryRank = modeStats.country_leaderboard_rank;
-            this.rank = modeStats.global_leaderboard_rank;
+            this.countryRank = modeStats.country_leaderboard_rank || 0;
+            this.rank = modeStats.global_leaderboard_rank || 0;
             this.pp = modeStats.pp;
             this.rankedScores = modeStats.ranked_score;
-            this.play_time = modeStats.play_time;
+            this.play_time = modeStats.play_time || 0;
         }
     }
 
