@@ -5,32 +5,15 @@ function CommandsInfo(prefix, prefix2) {
         args: "[]中的参数为必要参数，()中的参数为可选参数\n",
         userName: "绑定后username可以直接省略，纯数字id可以尝试在名字前后加上\"号\n"
     };
-    this.apiType = {
-        beatmap: 'apibeatmap',
-        user: 'apiuser',
-        score: 'apiscore',
-        scoreTop: 'apiscoreTop',
-        scoreVs: 'apiscoreVs',
-        scoreVsTop: 'apiscoreVsTop',
-        best: 'apibest',
-        bestRx: 'apibestRx',
-        bestList: 'apibestList',
-        bestListRx: 'apibestListRx',
-        recent: 'apirecent',
-        recentRx: 'apirecentRx',
-        recentPassed: 'apirecentPassed',
-        recentPassedRx: 'apirecentPassedRx'
-    };
     this.apiCommands = [
         {
             info: '谱面查询',
             command: ['b', 'map', 'beatmap', 'search'],
-            type: this.apiType.beatmap,
-            //api: 'getBeatmaps',
+            type: "beatmap",
             argsInfo: '[beatmap_id](+mods)(:mode)',
             args: ['orgArgs', 'b', 'mods', 'm'],
-            argsFromUserInfo: [false, true, false, false],    // mode 不要指定模式
-            reg: /^([0-9]+)[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
+            argsFromUserInfo: [false, false, false, false],    // mode 不要指定模式
+            reg: /^([0-9]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args
         }, {
             info: '玩家查询',
@@ -50,7 +33,7 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap_id] (user_id/"username")(+mods)(:mode)',
             args: ['orgArgs', 'b', 'u', 'mods', 'm'],
             argsFromUserInfo: [false, false, true, false, true],
-            reg: /^([0-9]+)([^:+#]+)?[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
+            reg: /^([0-9]+)([^:+#]+)?[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args + this.help.userName
         }, {
             info: '谱面最高成绩查询',
@@ -60,7 +43,7 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap_id](+mods)(:mode)',
             args: ['orgArgs', 'b', 'mods', 'm'],
             argsFromUserInfo: [false, false, false, true],
-            reg: /^([0-9]+)[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
+            reg: /^([0-9]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args
         }, {
             info: '谱面成绩vs查询',   // 暂时只做了2人对比，多人应该只要改一下正则就好了
@@ -70,7 +53,7 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap_id] (user_id/"username")|[user_id/"username"](+mods)(:mode)',
             args: ['orgArgs', 'b', 'u', 'u2', 'mods', 'm'],
             argsFromUserInfo: [false, false, true, false, false, true],
-            reg: /^([0-9]+)([^:+#\|]+)?\|([^:+#\|]+)[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
+            reg: /^([0-9]+)([^:+#|]+)?\|([^:+#|]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args + this.help.userName
         }, {
             info: '谱面成绩vstop查询',
@@ -80,7 +63,7 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap_id] (user_id/"username")(+mods)(:mode)',
             args: ['orgArgs', 'b', 'u', 'mods', 'm'],
             argsFromUserInfo: [false, false, true, false, true],
-            reg: /^([0-9]+)([^:+#]+)?[\+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
+            reg: /^([0-9]+)([^:+#]+)?[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
             note: this.help.args + this.help.userName
         }, {
             info: 'Relax模式指定bp成绩查询',

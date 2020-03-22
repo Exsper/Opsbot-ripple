@@ -40,7 +40,7 @@ class RippleScoreObject {
         const comboString = (this.mode === 0) ? this.maxcombo + "x/" + this.beatmap.maxCombo + "x\t " : "combo: " + this.maxcombo + "\t ";
         const accString = this.acc.toFixed(2) + "%\t ";
         const modsString = utils.getScoreModsString(this.mods);
-        const ppString = (this.pp === 0) ? "" : this.pp + "pp";
+        const ppString = (this.pp === 0) ? "" : this.pp.toFixed(2) + "pp";
         return name + comboString + accString + utils.format_number(this.score) + "\t " + this.rank + "\t | " + modsString + "\t " + ppString + "\n";
     }
 
@@ -50,7 +50,7 @@ class RippleScoreObject {
         const accString = "ACC：" + this.acc.toFixed(2) + "%\n";
         const modsString = "mod：" + utils.getScoreModsString(this.mods) + "\n";
         const rankString = "rank：" + this.rank + "\n";
-        const ppString = (this.pp === 0) ? "" : "pp：" + this.pp + "pp\n";
+        const ppString = (this.pp === 0) ? "" : "pp：" + this.pp.toFixed(2) + "pp\n";
         const scoreString = "分数：" + utils.format_number(this.score) + "\n";
         const count300String = (this.count300 <= 0) ? "" : "300：" + this.count300 + "  ";
         const count100String = (this.count100 <= 0) ? "" : "100：" + this.count100 + "  ";
