@@ -1,5 +1,7 @@
 "use strict";
 
+const OsusearchApiRequest = require("../api/OsusearchApiRequest");
+
 /**
  * 指令参数对象
  * @prop {Number} beatmapId 谱面Id，没直接提供为-1，需要通过osusearch获取
@@ -13,6 +15,7 @@
  * @prop {Number} mods modsValue
  * @prop {Number} limit 只用于部分功能
  * @prop {Array<"string"|"id">} type 指定玩家名类型
+ * @prop {String} error 可能出错的信息
  */
 class Arg {
     /**
@@ -52,6 +55,13 @@ class Arg {
         if (this.checkInt(beatmapString)) this.beatmapId = parseInt(beatmapString);
         else {
             let s = beatmapString;
+            // 先取mapper，因为mapper名字里可能有-[]
+            let mapperStart = s.lastIndexOf("(");
+            let mapperEnd = s.lastIndexOf(")");
+            if (mapperStart > 0 && mapperEnd > 0 && mapperEnd - mapperStart > 1) {
+                this.beatmapSearchInfo.mapper = s.substring(mapperStart + 1, mapperEnd).trim();
+                s = s.substring(0, mapperStart) + s.substring(mapperEnd + 1);
+            }
             // 取artist
             let artistEnd = s.indexOf("-");
             if (artistEnd > 0) {
@@ -63,14 +73,7 @@ class Arg {
             let diffEnd = s.lastIndexOf("]");
             if (diffStart > 0 && diffEnd > 0 && diffEnd - diffStart > 1) {
                 this.beatmapSearchInfo.diff_name = s.substring(diffStart + 1, diffEnd).trim();
-                s = s.substring(0, diffStart);
-            }
-            // 取mapper
-            let mapperStart = s.lastIndexOf("(");
-            let mapperEnd = s.lastIndexOf(")");
-            if (mapperStart > 0 && mapperEnd > 0 && mapperEnd - mapperStart > 1) {
-                this.beatmapSearchInfo.mapper = s.substring(mapperStart + 1, mapperEnd).trim();
-                s = s.substring(0, mapperStart);
+                s = s.substring(0, diffStart) + s.substring(diffEnd + 1);
             }
             // 取title
             this.beatmapSearchInfo.title = s.trim();
@@ -177,15 +180,54 @@ class Arg {
 
     /**
      * 转为osu api格式
-     * @returns {osuApi}
+     * @param {Number} myOsuId 省略user的指令需要使用传入值
+     * @returns {Array<Object>} [options, ...]
      */
-    getOsuApiObject() {
-
+    getOsuApiObject(myOsuId) {
+        let users = this.users;
+        if (myOsuId) users.push(myOsuId.toString());
+        let options = [];
+        if (users.length > 0) options = users.map( singleuser => {
+            let option = {};
+            if ((singleuser.length > 4) && (singleuser.substring(0, 1) === "\"") && (singleuser.substring(singleuser.length - 1) === "\"")) {
+                // 带引号强制字符串形式
+                option.u = singleuser.substring(1, singleuser.length - 1);
+                option.type = 'string';
+            }
+            else {
+                option.u = singleuser;
+            }
+            if (this.beatmapId > 0) option.b = this.beatmapId;
+            if (this.mode) option.m = this.mode;
+            if (this.mods) option.mods = this.mods;
+            if (this.limit) option.limit = this.limit;
+            return option;
+        });
+        else {
+            if (this.beatmapId > 0) options[0].b = this.beatmapId;
+            if (this.mode) options[0].m = this.mode;
+            if (this.mods) options[0].mods = this.mods;
+            if (this.limit) options[0].limit = this.limit;
+        }
+        return options;
     }
 
+    /**
+     * 通过osusearch获取谱面id
+     * @returns {Arg} this
+     */
+    async getBeatmapId() {
+        let id = await OsusearchApiRequest.search(this.beatmapSearchInfo);
+        if (typeof id === "number") {
+            this.beatmapId = id;
+        }
+        else {
+            if (id.code === 404) this.error = "找不到谱面：" + JSON.stringify(this.beatmapSearchInfo);
+            else this.error = "从osusearch获取谱面id失败";
+        }
+        return this;
+    }
 }
-
-
 
 
 module.exports = Arg;

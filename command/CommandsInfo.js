@@ -1,185 +1,150 @@
 function CommandsInfo(prefix, prefix2) {
-    this.prefix = prefix;
-    this.prefix2 = prefix2;
+    this.prefix = prefix; // 默认为*
+    this.prefix2 = prefix2; // 默认为%
     this.help = {
         args: "[]中的参数为必要参数，()中的参数为可选参数\n",
         userName: "绑定后username可以直接省略，纯数字id可以尝试在名字前后加上\"号\n"
     };
-    this.apiCommands = [
+    this.commandReg = /^([a-zA-Z]+)/i // 去除prefix后截取指令部分
+    this.regs = {
+        beatmapString: /^([^+＋:：#＃|｜/／“”'"]+)/i,
+        userStringWithBeatmap: /[|｜]([^+＋:：#＃|｜]+)/i, // 前面有beatmap时取user
+        userStringWithoutBeatmap: /^([^+＋:：#＃|｜]+)/i, // 前面没有beatmap时取user
+        modsString: /[+＋]([a-zA-Z0-9]+)/i,
+        modeString: /[:：]([^+＋:：#＃|｜/／“”'"]+)/i,
+        limitString: /[#＃]([0-9]+)/i,
+        noarg: undefined  // 不需要使用正则判断，参数格式简单或特殊参数
+    };
+    this.commands = [
         {
+            key: "beatmap",
             info: '谱面查询',
-            command: ['b', 'map', 'beatmap', 'search'],
-            type: "beatmap",
-            argsInfo: '[beatmap_id](+mods)(:mode)',
-            args: ['orgArgs', 'b', 'mods', 'm'],
-            argsFromUserInfo: [false, false, false, false],    // mode 不要指定模式
-            reg: /^([0-9]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
-            note: this.help.args
+            command: ['beatmap', 'search', 'b', 'map'],
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],    // 1：必须直接提供 0：user和mods，必须提供，省略时从存储中寻找 -1：可省略
         }, {
             info: '玩家查询',
-            command: ['u', 'user', 'p', 'player', 'stat', 'statme', 'ume'],
-            type: this.apiType.user,
-            //api: 'getUser',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            command: ['stat', 'statme', 'u', 'user', 'p', 'player'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1], 
         }, {
-            info: '谱面成绩查询',
-            command: ['s', 'score', 'me', 'sme', 'scoreme'],
-            type: this.apiType.score,
-            //api: 'getScores',
-            argsInfo: '[beatmap_id] (user_id/"username")(+mods)(:mode)',
-            args: ['orgArgs', 'b', 'u', 'mods', 'm'],
-            argsFromUserInfo: [false, false, true, false, true],
-            reg: /^([0-9]+)([^:+#]+)?[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: '玩家查询（relax模式）',
+            command: ['statrx', 'statmerx', 'urx', 'userrx', 'prx', 'playerrx'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1], 
+        }, {
+            info: '自己谱面成绩查询',
+            command: ['me'],
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
+        }, {
+            info: '自己谱面成绩查询（relax模式）',
+            command: ['merx'],
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
+        }, {
+            info: '指定玩家谱面成绩查询',
+            command: ['s', 'score'],
+            type: "成绩",
+            argsInfo: '[beatmap] | [user] (+mods) (:mode)',
+            args: ['beatmapString', 'userStringWithBeatmap', 'modsString', 'modeString'],
+            argNecessity: [1, 1, -1, -1],
+        }, {
+            info: '指定玩家谱面成绩查询（relax模式）',
+            command: ['srx', 'scorerx'],
+            type: "成绩",
+            argsInfo: '[beatmap] | [user] (+mods) (:mode)',
+            args: ['beatmapString', 'userStringWithBeatmap', 'modsString', 'modeString'],
+            argNecessity: [1, 1, -1, -1],
         }, {
             info: '谱面最高成绩查询',
             command: ['t', 'top'],
-            type: this.apiType.scoreTop,
-            //api: 'getScores',
-            argsInfo: '[beatmap_id](+mods)(:mode)',
-            args: ['orgArgs', 'b', 'mods', 'm'],
-            argsFromUserInfo: [false, false, false, true],
-            reg: /^([0-9]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
-            note: this.help.args
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
         }, {
-            info: '谱面成绩vs查询',   // 暂时只做了2人对比，多人应该只要改一下正则就好了
-            command: ['vs', 'svs', 'scorevs'],
-            type: this.apiType.scoreVs,
-            //api: 'getScores',
-            argsInfo: '[beatmap_id] (user_id/"username")|[user_id/"username"](+mods)(:mode)',
-            args: ['orgArgs', 'b', 'u', 'u2', 'mods', 'm'],
-            argsFromUserInfo: [false, false, true, false, false, true],
-            reg: /^([0-9]+)([^:+#|]+)?\|([^:+#|]+)[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: '谱面最高成绩查询（relax模式）',
+            command: ['trx', 'toprx'],
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
         }, {
-            info: '谱面成绩vstop查询',
+            info: '谱面成绩与最高成绩比较',
             command: ['vstop', 'topvs'],
-            type: this.apiType.scoreVsTop,
-            //api: 'getScores',
-            argsInfo: '[beatmap_id] (user_id/"username")(+mods)(:mode)',
-            args: ['orgArgs', 'b', 'u', 'mods', 'm'],
-            argsFromUserInfo: [false, false, true, false, true],
-            reg: /^([0-9]+)([^:+#]+)?[+]?([a-zA-Z0-9]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
         }, {
-            info: 'Relax模式指定bp成绩查询',
-            command: ['bprx', 'bestrx'],
-            type: this.apiType.bestRx,
-            //api: 'getUserBest',
-            argsInfo: '(user_id/"username")[#number](:mode)',
-            args: ['orgArgs', 'u', 'limit', 'm'],
-            argsFromUserInfo: [false, true, false, true],
-            reg: /^([^:+#]+)?[#]([0-9]+)[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: '谱面成绩与最高成绩比较（relax模式）',
+            command: ['vstoprx', 'topvsrx'],
+            type: "成绩",
+            argsInfo: '[beatmap] (+mods) (:mode)',
+            args: ['beatmapString', 'modsString', 'modeString'],
+            argNecessity: [1, -1, -1],
         }, {
-            info: '指定bp成绩查询',
-            command: ['bp', 'best'],
-            type: this.apiType.best,
-            //api: 'getUserBest',
-            argsInfo: '(user_id/"username")[#number](:mode)',
-            args: ['orgArgs', 'u', 'limit', 'm'],
-            argsFromUserInfo: [false, true, false, true],
-            reg: /^([^:+#]+)?[#]([0-9]+)[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: 'bp成绩查询（省略#number则输出bp5）',
+            command: ['bp', 'best', 'bbp', 'bests', 'mybp', 'bpme'],
+            argsInfo: '(user) (#number) (:mode)',
+            args: ['userStringWithoutBeatmap', 'limitString', 'modeString'],
+            argNecessity: [0, -1, -1],
         }, {
-            info: 'Relax模式bp列表查询',
-            command: ['bbprx', 'bestsrx', 'mybprx', 'bpmerx', 'rbq'],
-            type: this.apiType.bestListRx,
-            //api: 'getUserBest',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
-        }, {
-            info: 'bp列表查询',
-            command: ['bbp', 'bests', 'mybp', 'bpme'],
-            type: this.apiType.bestList,
-            //api: 'getUserBest',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
-        }, {
-            info: '获取最近Relax成绩（包括未pass成绩）',
-            command: ['rrx', 'rctrx', 'rctpprx', 'recentrx'],
-            type: this.apiType.recentRx,
-            //api: 'getUserRecent',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: 'bp成绩查询（省略#number则输出bp5）（relax模式）',
+            command: ['bprx', 'bestrx', 'bbprx', 'bestsrx', 'mybprx', 'bpmerx'],
+            argsInfo: '(user) (#number) (:mode)',
+            args: ['userStringWithoutBeatmap', 'limitString', 'modeString'],
+            argNecessity: [0, -1, -1],
         }, {
             info: '获取最近成绩（包括未pass成绩）',
             command: ['r', 'rct', 'rctpp', 'recent'],
-            type: this.apiType.recent,
-            //api: 'getUserRecent',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1],
         }, {
-            info: '获取最近Relax成绩（不包括未pass成绩）',
-            command: ['prrx'],
-            type: this.apiType.recentPassedRx,
-            //api: 'getUserRecent',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
+            info: '获取最近成绩（包括未pass成绩）（relax模式）',
+            command: ['rrx', 'rctrx', 'rctpprx', 'recentrx'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1],
         }, {
             info: '获取最近成绩（不包括未pass成绩）',
             command: ['pr', 'prsb'],
-            type: this.apiType.recentPassed,
-            //api: 'getUserRecent',
-            argsInfo: '(user_id/"username")(:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, true, true],
-            reg: /^([^:+#]+)?[:：]?(.+)?/i,
-            note: this.help.args + this.help.userName
-        }
-    ];
-    this.botCommandType = {
-        bind: 'botbind',
-        unbind: 'botunbind',
-        mode: 'botmode'
-    };
-    this.botCommands = [
-        {
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1],
+        }, {
+            info: '获取最近成绩（不包括未pass成绩）（relax模式）',
+            command: ['prrx'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [0, -1],
+        }, {
             info: '绑定osu账号',
             command: ['bind', 'set', 'setid'],
-            type: this.botCommandType.bind,
-            argsInfo: '[user_id/"username"](:mode)',
-            args: ['orgArgs', 'u', 'm'],
-            argsFromUserInfo: [false, false, false],
-            reg: /^([^:+#]+)[:：]?(.+)?/i,
-            note: ""
+            argsInfo: '[user] (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [1, -1],
         }, {
             info: '解绑osu账号',
-            command: ['unbind', 'unset'],
-            type: this.botCommandType.unbind,
+            command: ['unbind', 'unset', 'unsetid'],
             argsInfo: '无参数',
-            args: ['orgArgs', 'useless'],
-            argsFromUserInfo: [false, false],
-            reg: /^(.*)/i,
-            note: ""
+            args: [],
+            argNecessity: [],
         }, {
             info: '设置默认mode',
             command: ['mode'],
-            type: this.botCommandType.mode,
-            argsInfo: '(mode)',
-            args: ['orgArgs', 'm'],
-            argsFromUserInfo: [false, false],
-            reg: /^(.+)/i,
-            note: ""
+            argsInfo: '[mode]',
+            args: ['noarg'],
+            argNecessity: [1],
         }
     ]
 }

@@ -2,7 +2,7 @@ const querystring = require('querystring');
 const https = require('https');
 
 // 参考了白菜的源码：https://github.com/Mother-Ship/cabbageWeb/
-// 考虑到访问速度，只用于通过搜索获取谱面信息，按谱面id获取谱面信息时还是用osu api
+// 考虑到访问速度，只用于通过搜索获取谱面id，按谱面id获取谱面信息时还是用osu api
 class OsusearchApi {
     apiRequest(options) {
         return new Promise((resolve, reject) => {
@@ -37,20 +37,20 @@ class OsusearchApi {
         })
     }
 
-    async search(_data) {
+    static async search(_data) {
         let params = {};
         if (_data.title) params.title = _data.title;
         if (_data.artist) params.artist = _data.artist;
         if (_data.mapper) params.mapper = _data.mapper;
         if (_data.diff_name) params.diff_name = _data.diff_name;
-        if (_data.modes) params.modes = _data.modes; //Standard/Taiko/CtB/Mania
+        // if (_data.modes) params.modes = _data.modes; //Standard/Taiko/CtB/Mania
         params.query_order = "play_count";
         return await this.apiRequest(params).then(data => {
             try {
                 if (!data || data === "Server error.") return { code: 404 };
                 let result = JSON.parse(data);
                 if (result.result_count === 0) return { code: 404 };
-                return result.beatmaps[0];
+                return result.beatmaps[0].beatmap_id;
             }
             catch (ex) {
                 console.log(ex);
