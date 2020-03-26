@@ -9,6 +9,7 @@
 // 6. 重写help，增加中文关键字
 // 7. vstop bug
 // 8. v2 mod
+// 9. rxstat
 
 
 const UserInfo = require("./user/UserInfo");

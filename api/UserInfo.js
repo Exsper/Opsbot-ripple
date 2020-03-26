@@ -65,7 +65,7 @@ class UserInfo {
             await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
             output = output + "绑定账号" + userObject.username + "成功";
             if (osuInfo.m) {
-                output = output + "，默认模式设置为" + utils.getModeString(osuInfo.m);
+                output = output + "，默认模式设置为" + utils.getModeString(utils.getMode(osuInfo.m));
                 await nedb.update({ userId: userId }, { $set: { defaultMode: osuInfo.m } });
             }
             return output;
