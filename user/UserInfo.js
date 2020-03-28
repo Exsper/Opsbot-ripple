@@ -1,48 +1,71 @@
-const UserObject = require("../command/api/objects/UserObject");
-const getUserData = require("../command/api/getUserData");
-const utils = require('../command/api/utils');
+const UserObject = require("../api/objects/UserObject");
+const getUserData = require("../api/getUserData");
+const utils = require('../api/utils');
 
 // 记录内容：
-// userId, userName, beforeUserObject, afterUserObject, (qqId), (defaultMode), _Id(db自带)
+// userId, userName, beforeUserObject, afterUserObject, beforeRxUserObject, afterRxUserObject, (qqId), (defaultMode), _Id(db自带)
 
 class UserInfo {
-    static async updateToday(nedb, userId, newUserObjectJson) {
+    constructor(host) {
+        this.host = host;
+    }
+
+    async updateToday(nedb, userId, newUserObjectJson, isRx) {
         // afterUserObject与newUserObject同一天，更新afterUserObject
-        await nedb.update({ userId: userId }, { $set: { afterUserObject: newUserObjectJson } });
+        if (isRx) await nedb.update({ userId: userId }, { $set: { afterRxUserObject: newUserObjectJson } });
+        else await nedb.update({ userId: userId }, { $set: { afterUserObject: newUserObjectJson } });
     }
 
-    static async setNewDay(nedb, userId, oldUserObjectJson, newUserObjectJson) {
+    async setNewDay(nedb, userId, oldUserObjectJson, newUserObjectJson, isRx) {
         // afterUserObject与newUserObject不为同一天，冒泡
-        await nedb.update({ userId: userId }, { $set: { beforeUserObject: oldUserObjectJson, afterUserObject: newUserObjectJson } });
+        if (isRx) await nedb.update({ userId: userId }, { $set: { beforeRxUserObject: oldUserObjectJson, afterRxUserObject: newUserObjectJson } });
+        else await nedb.update({ userId: userId }, { $set: { beforeUserObject: oldUserObjectJson, afterUserObject: newUserObjectJson } });
     }
 
-    static async saveUserObject(nedb, newUserObject) {
+    async saveUserObject(nedb, newUserObject, isRx) {
         let userId = newUserObject.userId;
         // 查找是否已有记录
         let res = await nedb.findOne({ userId: userId });
-        if (res) {
-            // 更新userObject
-            let afterUserObject = new UserObject().init(res.afterUserObject);
-            if (afterUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson());
-            else await this.setNewDay(nedb, userId, res.afterUserObject, newUserObject.toJson());
+        if (!res) {
+            // 初始化记录
+            if (isRx) await nedb.insert({ userId: userId, userName: newUserObject.username, beforeRxUserObject: newUserObject.toJson(), afterRxUserObject: newUserObject.toJson() });
+            else await nedb.insert({ userId: userId, userName: newUserObject.username, beforeUserObject: newUserObject.toJson(), afterUserObject: newUserObject.toJson() });
+        }
+        else if (isRx && !res.afterRxUserObject) {
+            // 缺少rx stat记录
+            await nedb.update({ userId: userId }, { $set: { beforeRxUserObject: newUserObject.toJson(), afterRxUserObject: newUserObject.toJson() } });
+        }
+        else if (!isRx && !res.afterUserObject) {
+            // 缺少stat记录
+            await nedb.update({ userId: userId }, { $set: { beforeUserObject: newUserObject.toJson(), afterUserObject: newUserObject.toJson() } });
         }
         else {
-            // 初始化记录
-            await nedb.insert({ userId: userId, userName: newUserObject.username, beforeUserObject: newUserObject.toJson(), afterUserObject: newUserObject.toJson() });
+            // 更新userObject
+            if (isRx) {
+                let afterRxUserObject = new UserObject().init(res.afterRxUserObject);
+                if (afterRxUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson(), true);
+                else await this.setNewDay(nedb, userId, res.afterRxUserObject, newUserObject.toJson(), false);
+            }
+            else {
+                let afterUserObject = new UserObject().init(res.afterUserObject);
+                if (afterUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson(), true);
+                else await this.setNewDay(nedb, userId, res.afterUserObject, newUserObject.toJson(), false);
+            }
         }
     }
 
     // 获取对比资料
-    static async getBeforeUserObject(nedb, userId) {
+    async getBeforeUserObject(nedb, userId, isRx) {
         let res = await nedb.findOne({ userId: userId });
         if (res) {
+            if (isRx) return new UserObject().init(res.beforeRxUserObject);
             return new UserObject().init(res.beforeUserObject);
         }
         else return undefined;
     }
 
     // 绑定qqId
-    static async bindUser(rippleApi, nedb, qqId, osuInfo) {
+    async bindUser(nedb, qqId, apiObject) {
         let output = "";
         // 检查是否绑定过
         let res = await nedb.findOne({ qqId: qqId });
@@ -51,7 +74,7 @@ class UserInfo {
             output = output + "警告：您将自动与 " + res.userName + " 解除绑定\n";
             await nedb.update({ qqId: qqId }, { $unset: { qqId: true, defaultMode: true } });
         }
-        let userObject = await new getUserData().getUserObject(rippleApi, osuInfo, nedb);
+        let userObject = await new getUserData(this.host, apiObject, false).getUserObject(nedb);
         if (typeof userObject === "string") return userObject; // 报错消息
         // 这时数据库已记录该玩家，添加qqId字段即可
         // 检查该玩家是否已被绑定其他玩家
@@ -64,9 +87,9 @@ class UserInfo {
             }
             await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
             output = output + "绑定账号" + userObject.username + "成功";
-            if (osuInfo.m) {
-                output = output + "，默认模式设置为" + utils.getModeString(osuInfo.m);
-                await nedb.update({ userId: userId }, { $set: { defaultMode: osuInfo.m } });
+            if (apiObject.m) {
+                output = output + "，默认模式设置为" + utils.getModeString(apiObject.m);
+                await nedb.update({ userId: userId }, { $set: { defaultMode: apiObject.m } });
             }
             else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
             return output;
@@ -75,7 +98,7 @@ class UserInfo {
     }
 
     // 解绑QQ
-    static async unbindUser(nedb, qqId) {
+    async unbindUser(nedb, qqId) {
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
             // 绑定过，删除原来的qqId和defaultMode
@@ -86,19 +109,18 @@ class UserInfo {
     }
 
     // 设置默认模式
-    static async setMode(nedb, qqId, mode) {
-        let defaultMode = utils.getMode(mode);
+    async setMode(nedb, qqId, mode) {
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
             // 绑定过，更改原来的defaultMode
-            await nedb.update({ qqId: qqId }, { $set: { defaultMode: defaultMode } });
-            return "您的默认游戏模式已设置为 " + utils.getModeString(defaultMode);
+            await nedb.update({ qqId: qqId }, { $set: { defaultMode: mode } });
+            return "您的默认游戏模式已设置为 " + utils.getModeString(mode);
         }
         else return "您还没有绑定任何账号";
     }
 
     // 获取绑定账号Id和mod
-    static async getUserOsuInfo(qqId, nedb) {
+    async getUserOsuInfo(qqId, nedb) {
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
             let defaultMode = res.defaultMode || "";

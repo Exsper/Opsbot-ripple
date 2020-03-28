@@ -4,36 +4,39 @@ const OsusearchApiRequest = require("../api/OsusearchApiRequest");
 
 /**
  * 指令参数对象
- * @prop {Number} beatmapId 谱面Id，没直接提供为-1，需要通过osusearch获取
- * @prop {Object} beatmapSearchInfo 谱面待搜索的信息
- * @prop {String} beatmapSearchInfo.artist 
- * @prop {String} beatmapSearchInfo.title 
- * @prop {String} beatmapSearchInfo.mapper 
- * @prop {String} beatmapSearchInfo.diff_name 
- * @prop {Array<String>} users 玩家名Array，未指定玩家则length=0
- * @prop {0|1|2|3} mode 模式
- * @prop {Number} mods modsValue
- * @prop {Number} limit 只用于部分功能
- * @prop {Array<"string"|"id">} type 指定玩家名类型
- * @prop {String} error 可能出错的信息
+ * @property {Number} beatmapId 谱面Id，没直接提供为-1，需要通过osusearch获取
+ * @property {Object} beatmapSearchInfo 谱面待搜索的信息
+ * @property {String} beatmapSearchInfo.artist 
+ * @property {String} beatmapSearchInfo.title 
+ * @property {String} beatmapSearchInfo.mapper 
+ * @property {String} beatmapSearchInfo.diff_name 
+ * @property {Array<String>} users 玩家名Array，未指定玩家则length=0
+ * @property {0|1|2|3} mode 模式
+ * @property {Number} mods modsValue
+ * @property {Number} limit 只用于部分功能
+ * @property {Array<"string"|"id">} type 指定玩家名类型
  */
 class Arg {
     /**
      * 构建Arg对象
      * @param {Object} args 从指令参数字符串拿到的各参数字符串
-     * @param {String} args.beatmapString beatmap字符串，谱面Id或是需要search的谱面字符串
-     * @param {String} args.usersString 玩家名字符串，以/分割
-     * @param {String} args.modeString 模式字符串
-     * @param {String} args.modsString mod字符串
-     * @param {String} args.limitString limit字符串
+     * @param {String=} args.beatmapString beatmap字符串，谱面Id或是需要search的谱面字符串
+     * @param {String=} args.userStringWithBeatmap 玩家名字符串，以/分割
+     * @param {String=} args.userStringWithoutBeatmap 玩家名字符串，以/分割
+     * @param {String=} args.modsString mod字符串
+     * @param {String=} args.modeString 模式字符串
+     * @param {String=} args.onlyModeString 模式字符串
+     * @param {String=} args.limitString limit字符串
      */
     constructor(args) {
         this.beatmapId = -1;
         this.beatmapSearchInfo = {};
         if (args.beatmapString) this.getBeatmapInfo(args.beatmapString);
-        if (args.usersString) this.users = this.getUsers(args.usersString);
-        if (args.modeString) this.mode = this.getMode(args.modeString);
+        if (args.userStringWithBeatmap) this.users = this.getUsers(args.userStringWithBeatmap);
+        if (args.userStringWithoutBeatmap) this.users = this.getUsers(args.userStringWithoutBeatmap);
         if (args.modsString) this.mods = this.getEnabledModsValue(args.modsString);
+        if (args.modeString) this.mode = this.getMode(args.modeString);
+        if (args.onlyModeString) this.mode = this.getMode(args.onlyModeString);
         if (args.limitString) this.limit = parseInt(args.limitString);
     }
 
@@ -82,13 +85,21 @@ class Arg {
 
     /**
      * 只用于查询单个谱面的多人成绩
-     * @param {String} userString 以/分割的玩家名
+     * @param {String|Number} userString 以/分割的玩家名
      * @returns {Array<String>} 玩家名Array，未指定玩家则length=0
      */
     getUsers(userString) {
         let users = [];
+        if (typeof userString === "number") {
+            // 是从数据库获取的
+            if (userString > 0) users.push(userString.toString());
+            // 数据库找不到就是空
+            return users;
+        }
         if (typeof userString !== "string") return users;
         users = userString.split("/").filter(d => d).map(d => d.trim());
+        // 防止请求过多，人数控制在10人以内
+        if (users.length>10) users = users.slice(0, 10);
         return users;
     }
 
@@ -130,7 +141,7 @@ class Arg {
             NM: 0, // None
             NF: 1,
             EZ: 2,
-            //TD : 4, //TouchDevice
+            TD: 4, //TouchDevice
             HD: 8,
             HR: 16,
             SD: 32,
@@ -149,7 +160,7 @@ class Arg {
             '7K': 262144,
             '8K': 524288,
             FI: 1048576,
-            //Random : 2097152,
+            RD: 2097152, //Random
             //Cinema : 4194304,
             //Target : 8388608,
             '9K': 16777216,
@@ -157,8 +168,8 @@ class Arg {
             '1K': 67108864,
             '3K': 134217728,
             '2K': 268435456,
-            V2: 536870912 //ScoreV2
-            //Mirror : 1073741824,
+            V2: 536870912, //ScoreV2
+            MR: 1073741824 // Mirror
             //KeyMod : Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop,
             //FreeModAllowed : NoFail | Easy | Hidden | HardRock | SuddenDeath | Flashlight | FadeIn | Relax | Relax2 | SpunOut | KeyMod,
             //ScoreIncreaseMods : Hidden | HardRock | DoubleTime | Flashlight | FadeIn
@@ -180,14 +191,12 @@ class Arg {
 
     /**
      * 转为osu api格式
-     * @param {Number} myOsuId 省略user的指令需要使用传入值
      * @returns {Array<Object>} [options, ...]
      */
-    getOsuApiObject(myOsuId) {
+    getOsuApiObject() {
         let users = this.users;
-        if (myOsuId) users.push(myOsuId.toString());
         let options = [];
-        if (users.length > 0) options = users.map( singleuser => {
+        if (users.length > 0) options = users.map(singleuser => {
             let option = {};
             if ((singleuser.length > 4) && (singleuser.substring(0, 1) === "\"") && (singleuser.substring(singleuser.length - 1) === "\"")) {
                 // 带引号强制字符串形式
@@ -217,13 +226,14 @@ class Arg {
      * @returns {Arg} this
      */
     async getBeatmapId() {
+        if (Object.keys(this.beatmapSearchInfo).length <= 0) return this;
         let id = await OsusearchApiRequest.search(this.beatmapSearchInfo);
         if (typeof id === "number") {
             this.beatmapId = id;
         }
         else {
-            if (id.code === 404) this.error = "找不到谱面：" + JSON.stringify(this.beatmapSearchInfo);
-            else this.error = "从osusearch获取谱面id失败";
+            if (id.code === 404) throw "找不到谱面：" + JSON.stringify(this.beatmapSearchInfo);
+            else throw "从osusearch获取谱面id失败";
         }
         return this;
     }

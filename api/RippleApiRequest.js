@@ -1,13 +1,11 @@
+"use strict";
 
-// 只用到recent和best/rxrecent和rxbest
+const querystring = require('querystring');
+const https = require('https');
+
 class RippleApi {
-    constructor(host) {
-        this.host = host || 'osu.ppy.sb';
-    }
-
-    apiRequest(options) {
+    static apiRequest(options) {
         return new Promise((resolve, reject) => {
-            const querystring = require('querystring');
             const contents = (options.data) ? querystring.stringify(options.data) : "";
             const requestOptions = {
                 host: options.host,
@@ -21,7 +19,6 @@ class RippleApi {
                 }
             }
             let _data = '';
-            const https = require('https');
             const req = https.request(requestOptions, function (res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -40,11 +37,11 @@ class RippleApi {
         })
     }
 
-    async apiCall(_path, _data) {
+    static async apiCall(_path, _data, _host) {
         return await this.apiRequest({
             path: _path,
             data: _data,
-            host: this.host
+            host: _host
         }).then(data => {
             try {
                 if (!data || data === "null") return { code: 404 };
@@ -58,12 +55,12 @@ class RippleApi {
     }
 
     //判断字符串是否为正整数
-    checkInt(nubmer) {
+    static checkInt(nubmer) {
         var re = /^\d+$/;
         return (re.test(nubmer));
     }
 
-    setIdOrName(options, data = {}) {
+    static setIdOrName(options, data = {}) {
         const u = options.u;
         const type = options.type;
         if (type) {
@@ -74,8 +71,8 @@ class RippleApi {
         else { data.name = u; return data; }
     }
 
-    async getPing() {
-        const resp = await this.apiCall('/ping');
+    static async getPing(host) {
+        const resp = await this.apiCall('/ping', null, host);
         return resp;
     }
 
@@ -83,9 +80,9 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getUsers(options) {
+    static async getUsers(options, host) {
         let data = this.setIdOrName(options);
-        const resp = await this.apiCall('/users', data);
+        const resp = await this.apiCall('/users', data, host);
         return resp;
     }
 
@@ -93,9 +90,9 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getUsersFull(options) {
+    static async getUsersFull(options, host) {
         let data = this.setIdOrName(options);
-        const resp = await this.apiCall('/users/full', data);
+        const resp = await this.apiCall('/users/full', data, host);
         return resp;
     }
 
@@ -103,9 +100,9 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getUserId(options) {
+    static async getUserId(options, host) {
         let data = { name: options.u };
-        const resp = await this.apiCall('/whatid', data);
+        const resp = await this.apiCall('/whatid', data, host);
         return resp;
     }
 
@@ -113,11 +110,11 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getRecent(options) {
+    static async getRecent(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
-        const resp = await this.apiCall('/users/scores/recent', data);
+        const resp = await this.apiCall('/users/scores/recent', data, host);
         return resp;
     }
 
@@ -125,11 +122,11 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getRecentRx(options) {
+    static async getRecentRx(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
-        const resp = await this.apiCall('/users/scores/rxrecent', data);
+        const resp = await this.apiCall('/users/scores/rxrecent', data, host);
         return resp;
     }
 
@@ -137,11 +134,11 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getBests(options) {
+    static async getBests(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
-        const resp = await this.apiCall('/users/scores/best', data);
+        const resp = await this.apiCall('/users/scores/best', data, host);
         return resp;
     }
 
@@ -149,11 +146,11 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
-    async getBestsRx(options) {
+    static async getBestsRx(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
-        const resp = await this.apiCall('/users/scores/rxbest', data);
+        const resp = await this.apiCall('/users/scores/rxbest', data, host);
         return resp;
     }
 

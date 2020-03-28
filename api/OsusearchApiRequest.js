@@ -1,10 +1,12 @@
+"use strict";
+
 const querystring = require('querystring');
 const https = require('https');
 
 // 参考了白菜的源码：https://github.com/Mother-Ship/cabbageWeb/
 // 考虑到访问速度，只用于通过搜索获取谱面id，按谱面id获取谱面信息时还是用osu api
 class OsusearchApi {
-    apiRequest(options) {
+    static apiRequest(options) {
         return new Promise((resolve, reject) => {
             const contents = (options.data) ? querystring.stringify(options.data) : "";
             const requestOptions = {

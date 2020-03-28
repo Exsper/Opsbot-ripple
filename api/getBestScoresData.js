@@ -1,3 +1,5 @@
+"use strict";
+
 const RippleScoreObject = require("./objects/RippleScoreObject");
 const getScoreData = require("./getScoreData");
 
