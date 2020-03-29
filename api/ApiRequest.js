@@ -1,13 +1,11 @@
+"use strict";
 
+const querystring = require('querystring');
+const https = require('https');
 
 class OsuApi {
-    constructor(host) {
-        this.host = host || 'osu.ppy.sb';
-    }
-
-    apiRequest(options) {
+    static apiRequest(options) {
         return new Promise((resolve, reject) => {
-            const querystring = require('querystring');
             const contents = querystring.stringify(options.data);
             const requestOptions = {
                 host: options.host,
@@ -21,7 +19,9 @@ class OsuApi {
                 }
             }
             let _data = '';
-            const https = require('https');
+
+            console.log("发送请求：" + requestOptions.host + requestOptions.path);
+
             const req = https.request(requestOptions, function (res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {
@@ -40,11 +40,11 @@ class OsuApi {
         })
     }
 
-    async apiCall(_path, _data) {
+    static async apiCall(_path, _data, _host) {
         return await this.apiRequest({
             path: _path,
             data: _data,
-            host: this.host
+            host: _host
         }).then(data => {
             try {
                 if (!data || data === "null") return { code: 404 };
@@ -57,33 +57,33 @@ class OsuApi {
         });
     }
 
-    async getBeatmaps(options) {
-        const resp = await this.apiCall('/get_beatmaps', options);
+    static async getBeatmaps(options, host) {
+        const resp = await this.apiCall('/get_beatmaps', options, host);
         return resp;
     }
 
-    async getUser(options) {
-        const resp = await this.apiCall('/get_user', options);
+    static async getUser(options, host) {
+        const resp = await this.apiCall('/get_user', options, host);
         return resp;
     }
 
-    async getScores(options) {
-        const resp = await this.apiCall('/get_scores', options);
+    static async getScores(options, host) {
+        const resp = await this.apiCall('/get_scores', options, host);
         return resp;
     }
 
-    async getUserBest(options) {
-        const resp = await this.apiCall('/get_user_best', options);
+    static async getUserBest(options, host) {
+        const resp = await this.apiCall('/get_user_best', options, host);
         return resp;
     }
 
-    async getUserRecent(options) {
-        const resp = await this.apiCall('/get_user_recent', options);
+    static async getUserRecent(options, host) {
+        const resp = await this.apiCall('/get_user_recent', options, host);
         return resp;
     }
 
-    async getUserRecentRx(options) {
-        const resp = await this.apiCall('/get_user_rxrecent', options);
+    static async getUserRecentRx(options, host) {
+        const resp = await this.apiCall('/get_user_rxrecent', options, host);
         return resp;
     }
 }

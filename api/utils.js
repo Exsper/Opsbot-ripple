@@ -2,6 +2,7 @@ class utils {
     // 获取格式化游玩时长
     static getUserTimePlayed(play_time) {
         const s = parseInt(play_time);
+        if (s <= 0) return "从来没玩过";
         const day = Math.floor(s / (24 * 3600)); // Math.floor()向下取整 
         const hour = Math.floor((s - day * 24 * 3600) / 3600);
         const minute = Math.floor((s - day * 24 * 3600 - hour * 3600) / 60);
@@ -13,6 +14,7 @@ class utils {
         // if (second>0) output = output + second + "秒";
         return output;
     }
+
     // 整数每3位加逗号
     static format_number(n) {
         var b = parseInt(n).toString();
@@ -21,6 +23,7 @@ class utils {
         var r = len % 3;
         return r > 0 ? b.slice(0, r) + "," + b.slice(r, len).match(/\d{3}/g).join(",") : b.slice(r, len).match(/\d{3}/g).join(",");
     }
+
     // enabled_mods转为mods数组
     static getScoreMods(enabledMods) {
         let raw_mods = parseInt(enabledMods);
@@ -55,6 +58,8 @@ class utils {
             'Key1': 1 << 26,
             'Key3': 1 << 27,
             'Key2': 1 << 28,
+            'ScoreV2': 1 << 29,
+            'Mirror': 1 << 30,
             'KeyMod': 521109504,
             'FreeModAllowed': 522171579,
             'ScoreIncreaseMods': 1049662
@@ -69,111 +74,59 @@ class utils {
     // enabled_mods转为字符串
     static getScoreModsString(enabledMods) {
         const modsArr = this.getScoreMods(enabledMods);
-        // 只需要把常用的提取出来就好了
         let abbMods = [];
+        let hasV2 = false;
         let hasRelax = false;
         for (let i = 0; i < modsArr.length; i++) {
-            if (modsArr[i] === "Hidden") abbMods.push("HD");
-            else if (modsArr[i] === "HardRock") abbMods.push("HR");
-            else if (modsArr[i] === "DoubleTime") abbMods.push("DT");
-            else if (modsArr[i] === "Nightcore") abbMods.push("NC");
-            else if (modsArr[i] === "Flashlight") abbMods.push("FL");
-            else if (modsArr[i] === "Easy") abbMods.push("EZ");
-            else if (modsArr[i] === "HalfTime") abbMods.push("HT");
-            else if (modsArr[i] === "NoFail") abbMods.push("NF");
-            else if (modsArr[i] === "SpunOut") abbMods.push("SO");
-            //else if (modsArr[i] === "TouchDevice") abbMods.push("TD");
-            else if (modsArr[i] === "KeyMod") abbMods.push("KeyMod");
-            else if (modsArr[i] === "Relax") hasRelax = true;
+            switch (modsArr[i]) {
+                case "Hidden": { abbMods.push("HD"); break; }
+                case "HardRock": { abbMods.push("HR"); break; }
+                case "DoubleTime": { abbMods.push("DT"); break; }
+                case "Nightcore": { abbMods.push("NC"); break; }
+                case "Flashlight": { abbMods.push("FL"); break; }
+                case "Easy": { abbMods.push("EZ"); break; }
+                case "HalfTime": { abbMods.push("HT"); break; }
+                case "NoFail": { abbMods.push("NF"); break; }
+                case "SpunOut": { abbMods.push("SO"); break; }
+                case "SuddenDeath": { abbMods.push("SD"); break; }
+                case "Perfect": { abbMods.push("PF"); break; }
+                case "Autopilot": { abbMods.push("AP"); break; }
+                case "TouchDevice": { abbMods.push("TD"); break; }
+                case "FadeIn": { abbMods.push("FI"); break; }
+                case "Random": { abbMods.push("RD"); break; }
+                case "Mirror": { abbMods.push("MR"); break; }
+                case "Key1": { abbMods.push("1K"); break; }
+                case "Key2": { abbMods.push("2K"); break; }
+                case "Key3": { abbMods.push("3K"); break; }
+                case "Key4": { abbMods.push("4K"); break; }
+                case "Key5": { abbMods.push("5K"); break; }
+                case "Key6": { abbMods.push("6K"); break; }
+                case "Key7": { abbMods.push("7K"); break; }
+                case "Key8": { abbMods.push("8K"); break; }
+                case "Key9": { abbMods.push("9K"); break; }
+                case "ScoreV2": { hasV2 = true; break; }
+                case "Relax": { hasRelax = true; break; }
+                // default: { abbMods.push(modsArr[i]); break; }
+            }
         }
         // 有NC时去掉DT
         const indexDT = abbMods.indexOf("DT");
         const indexNC = abbMods.indexOf("NC");
         if (indexNC >= 0) abbMods.splice(indexDT, 1);
+        // 有PF时去掉SD
+        const indexSD = abbMods.indexOf("SD");
+        const indexPF = abbMods.indexOf("PF");
+        if (indexPF >= 0) abbMods.splice(indexSD, 1);
+
         let modsString = abbMods.join("");
         if (!modsString) modsString = "None"
+        // V2放后面
+        if (hasV2) modsString = modsString + ", ScoreV2";
         // relax放最后面
         if (hasRelax) modsString = modsString + ", Relax";
         return modsString;
     }
 
-    // 计算mods数值（指令+号后面的）
-    static getEnabledModsValue(modsString) {
-        let mods = {
-            //None : 0,
-            NF: 1,
-            EZ: 2,
-            //TD : 4, //TouchDevice
-            HD: 8,
-            HR: 16,
-            SD: 32,
-            DT: 64,
-            //Relax : 128,
-            HT: 256,
-            NC: 512, // Only set along with DoubleTime. i.e: NC only gives 576
-            FL: 1024,
-            //Autoplay : 2048,
-            SO: 4096,
-            //Relax2 : 8192,    // Autopilot
-            PF: 16384, // Only set along with SuddenDeath. i.e: PF only gives 16416  
-            '4K': 32768,
-            '5K': 65536,
-            '6K': 131072,
-            '7K': 262144,
-            '8K': 524288,
-            FI: 1048576,
-            //Random : 2097152,
-            //Cinema : 4194304,
-            //Target : 8388608,
-            '9K': 16777216,
-            //KeyCoop : 33554432,
-            '1K': 67108864,
-            '3K': 134217728,
-            '2K': 268435456
-            //ScoreV2 : 536870912,
-            //Mirror : 1073741824,
-            //KeyMod : Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop,
-            //FreeModAllowed : NoFail | Easy | Hidden | HardRock | SuddenDeath | Flashlight | FadeIn | Relax | Relax2 | SpunOut | KeyMod,
-            //ScoreIncreaseMods : Hidden | HardRock | DoubleTime | Flashlight | FadeIn
-        };
-        let sum = 0;
-        let i = 0;
-        let length = modsString.length;
-        while (i + 2 <= length) {
-            let s = modsString.substring(i, i + 2);
-            if (mods[s] !== undefined) {
-                if (s === 'NC') sum = sum + mods.DT;
-                else if (s === 'PF') sum = sum + mods.SD;
-                sum = sum + mods[s];
-            }
-            i += 2;
-        }
-        return sum;
-    }
-
-    // String转mode
-    static getMode(modeString) {
-        let s = modeString.trim().toLowerCase();
-        if (s === "0" || s === "1" || s === "2" || s === "3") return s;
-        else if (s.indexOf("std") >= 0) return "0";
-        else if (s.indexOf("standard") >= 0) return "0";
-        else if (s.indexOf("click") >= 0) return "0";
-        else if (s.indexOf("泡泡") >= 0) return "0";
-        else if (s.indexOf("taiko") >= 0) return "1";
-        else if (s.indexOf("鼓") >= 0) return "1";
-        else if (s.indexOf("catch") >= 0) return "2";
-        else if (s.indexOf("ctb") >= 0) return "2";
-        else if (s.indexOf("接") >= 0) return "2";
-        else if (s.indexOf("mania") >= 0) return "3";
-        else if (s.indexOf("key") >= 0) return "3";
-        else if (s.indexOf("骂娘") >= 0) return "3";
-        else if (s === "s") return "0";
-        else if (s === "t") return "1";
-        else if (s === "c") return "2";
-        else if (s === "m") return "3";
-        //else return s;
-        else return "0";
-    }
     // mode转string
     static getModeString(mode) {
         if (mode !== 0 && mode !== "0" && !mode) return "当你看到这条信息说明代码有漏洞惹";

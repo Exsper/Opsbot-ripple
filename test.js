@@ -1,9 +1,7 @@
 "use strict";
 
-const UserInfo = require("./user/UserInfo");
-const CommandObject = require("./command/CommandObject");
-const OsuApi = require("./command/api/ApiRequest");
-const RippleApi = require("./command/api/RippleApiRequest");
+const CommandsInfo = require("./command/CommandsInfo");
+const Command = require("./command/Command");
 
 // 模拟meta
 console.log("你的QQ号是1了");
@@ -29,12 +27,12 @@ function next() {
 }
 
 
-const prefix = "%";
-const prefix2 = "*";
-const osuApi = new OsuApi();
-const rippleApi = new RippleApi();
-const nedb = require('./database/nedb')(__dirname + '/database/save.db');
+const prefix = "*";
+const prefix2 = "%";
+const host = "osu.ppy.sb";
 
+const nedb = require('./database/nedb')(__dirname + '/database/save.db');
+const commandsInfo = new CommandsInfo(prefix, prefix2);
 
 let myQQ = "1";
 const readline = require("readline");
@@ -58,10 +56,9 @@ rl.on("line", (line) => {
 
 async function run(meta, next) {
     try {
-        let userOsuInfo = await UserInfo.getUserOsuInfo(meta.userId, nedb);
-        let commandObject = new CommandObject(meta, meta.message);
-        let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
-        if (reply !== "") return meta.$send(reply);
+        let commandObject = new Command(meta, host);
+        let reply = await commandObject.execute(commandsInfo, nedb);
+        if (reply !== "") return meta.$send(`[CQ:at,qq=${meta.userId}]` + "\n" + reply);
         return next();
     } catch (ex) {
         console.log(ex);
