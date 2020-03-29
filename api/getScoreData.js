@@ -16,7 +16,7 @@ class getScoreData {
     }
 
     async getScoreObjects(argObject, beatmapObject) {
-        const result = await RippleApi.getScores(argObject);
+        const result = await RippleApi.getScores(argObject, this.host);
         if (result.code === 404) throw "找不到成绩 " + JSON.stringify(argObject);
         if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(argObject);
         let scores = result.scores;
@@ -44,7 +44,7 @@ class getScoreData {
     searchUsersScore(scoreObjects, userIds) {
         let searchResult = [];
         for (var i = 0; i < scoreObjects.length; i++) {
-            let thisScoreUserId = scoreObjects[i].user.id.toString();
+            let thisScoreUserId = scoreObjects[i].user.userId.toString();
             let thisScoreUserName = scoreObjects[i].user.username;
             let findIndex = userIds.indexOf(thisScoreUserId);
             let findIndex2 = userIds.indexOf(thisScoreUserName);
@@ -88,7 +88,7 @@ class getScoreData {
             });
             let beatmapObject = await this.getBeatmapObject();
             let scoreObjects = await this.getScoreObjects(this.apiObjects[0], beatmapObject);
-            if (this.isVsTop) userIds.push(scoreObjects[0].user.id.toString());
+            if (this.isVsTop) userIds.push(scoreObjects[0].user.userId.toString());
             // 如果scoreObjects每个玩家成绩唯一，即使userIds有重复也不会输出重复成绩的
             let searchResult = this.searchUsersScore(scoreObjects, userIds);
             if (searchResult.length <= 0) return "没找到指定玩家的成绩";

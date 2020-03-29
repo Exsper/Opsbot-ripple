@@ -1,8 +1,8 @@
 "use strict";
 
-const UserObject = require("../api/objects/UserObject");
-const getUserData = require("../api/getUserData");
-const utils = require('../api/utils');
+const UserObject = require("./objects/UserObject");
+const getUserData = require("./getUserData");
+const utils = require('./utils');
 
 // 记录内容：
 // userId, userName, beforeUserObject, afterUserObject, beforeRxUserObject, afterRxUserObject, (qqId), (defaultMode), _Id(db自带)

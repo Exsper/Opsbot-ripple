@@ -9,9 +9,9 @@ class ScoreObject {
     constructor(score, beatmap, user) {
 
         if (score.beatmap) this.beatmap = new BeatmapObject(score.beatmap, true);
-        else this.beatmap = new BeatmapObject(beatmap);
+        else this.beatmap = beatmap;
         if (score.user) this.user = new SimpleUserObject(score.user)
-        else this.user = new SimpleUserObject(user)
+        else this.user = user;
 
         this.score = score.score;
         this.maxcombo = score.max_combo;
@@ -50,12 +50,35 @@ class ScoreObject {
         const rankString = "rank：" + this.rank + "\n";
         const ppString = (this.pp === 0 || this.completed === 0) ? "" : "pp：" + this.pp.toFixed(2) + "pp\n";
         const scoreString = "分数：" + utils.format_number(this.score) + "\n";
-        const count300String = (this.count300 <= 0) ? "" : "300：" + this.count300 + "  ";
-        const count100String = (this.count100 <= 0) ? "" : "100：" + this.count100 + "  ";
-        const count50String = (this.count50 <= 0) ? "" : "50：" + this.count50 + "  ";
-        const countMissString = (this.countmiss <= 0) ? "" : "miss：" + this.countmiss;
-        const hitCountString = count300String + count100String + count50String + countMissString;
-        return name + comboString + accString + modsString + rankString + ppString + scoreString + hitCountString;
+        let counts = [];
+        if (this.mode === 0) {// std
+            if (this.count300 > 0) counts.push(" " + this.count300 + "x 300 ");
+            if (this.count100 > 0) counts.push(" " + this.count100 + "x 100 ");
+            if (this.count50 > 0) counts.push(" " + this.count50 + "x 50 ");
+            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss ");
+        }
+        else if (this.mode === 1) {// taiko
+            if (this.count300 > 0) counts.push(" " + this.count300 + "x 300 ");
+            if (this.count100 > 0) counts.push(" " + this.count100 + "x 100 ");
+            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss ");
+        }
+        else if (this.mode === 2) {// catch
+            if (this.count300 > 0) counts.push(" " + this.count300 + "x 大果 ");
+            if (this.count100 > 0) counts.push(" " + this.count100 + "x 中果 ");
+            if (this.count50 > 0) counts.push(" " + this.count50 + "x 小果 ");
+            if (this.countkatu > 0) counts.push(" " + this.countkatu + "x miss小果 ");
+            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss大果 ");
+        }
+        else if (this.mode === 3) {// mania
+            if (this.countgeki > 0) counts.push(" " + this.countgeki + "x 彩300 ");
+            if (this.count300 > 0) counts.push(" " + this.count300 + "x 300 ");
+            if (this.countkatu > 0) counts.push(" " + this.countkatu + "x 200 ");
+            if (this.count100 > 0) counts.push(" " + this.count100 + "x 100 ");
+            if (this.count50 > 0) counts.push(" " + this.count50 + "x 50 ");
+            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss ");
+        }
+
+        return name + comboString + accString + modsString + rankString + ppString + scoreString + counts.join("|");
     }
 
 }

@@ -8,7 +8,7 @@ const https = require('https');
 class OsusearchApi {
     static apiRequest(options) {
         return new Promise((resolve, reject) => {
-            const contents = (options.data) ? querystring.stringify(options.data) : "";
+            const contents = (options) ? querystring.stringify(options) : "";
             const requestOptions = {
                 host: 'osusearch.com',
                 port: 443,
@@ -21,6 +21,9 @@ class OsusearchApi {
                 }
             }
             let _data = '';
+
+            console.log("发送请求：" + requestOptions.host + requestOptions.path);
+
             const req = https.request(requestOptions, function (res) {
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) {

@@ -1,21 +1,7 @@
 "use strict";
 
-// TODO
-// 1. 成绩 star数保留2位
-// 2. 成绩 128x 300 | 256x 100 |...   不同模式区分
-// 3. *放第一个 %放第二个
-// 4. 搜索谱面
-// 5. 重构command和正则
-// 6. 重写help，增加中文关键字
-// 7. vstop bug
-// 8. v2 mod
-// 9. rxstat
-
-
-const UserInfo = require("./user/UserInfo");
-const CommandObject = require("./command/CommandObject");
-const OsuApi = require("./command/api/ApiRequest");
-const RippleApi = require("./command/api/RippleApiRequest");
+const CommandsInfo = require("./command/CommandsInfo");
+const Command = require("./command/Command");
 
 // Koishi插件名
 module.exports.name = "opsbot-ripple";
@@ -27,19 +13,14 @@ module.exports.apply = (ctx, config = {}) => {
 	const host = config.host || "osu.ppy.sb";
 	const database = config.database || './Opsbot-Ripple-v1.db';
 
-	const osuApi = new OsuApi(host);
-	const rippleApi = new RippleApi(host);
-
-	// nedb
 	const nedb = require('./database/nedb')(database);
+	const commandsInfo = new CommandsInfo(prefix, prefix2);
 
 	ctx.middleware(async (meta, next) => {
 		try {
-			const qqId = meta.userId;
-			let userOsuInfo = await UserInfo.getUserOsuInfo(meta.userId, nedb);
-			let commandObject = new CommandObject(meta, meta.message);
-			let reply = await commandObject.execute(osuApi, rippleApi, userOsuInfo, nedb, prefix, prefix2);
-			if (reply !== "") return meta.$send(`[CQ:at,qq=${qqId}]` + "\n" + reply);
+			let commandObject = new Command(meta, host);
+			let reply = await commandObject.execute(commandsInfo, nedb);
+			if (reply !== "") return meta.$send(`[CQ:at,qq=${meta.userId}]` + "\n" + reply);
 			return next();
 		} catch (ex) {
 			console.log(ex);

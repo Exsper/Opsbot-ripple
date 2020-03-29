@@ -4,7 +4,7 @@ const utils = require('../utils');
 class ModeStatsObject {
     constructor(modeStats) {
         if (modeStats) {
-            this.accuracy = parseFloat(modeStats.accuracy.toFixed(4));
+            this.accuracy = parseFloat(modeStats.accuracy.toFixed(2));
             this.playcount = modeStats.playcount;
             this.level = parseFloat(modeStats.level.toFixed(2));
             this.countryRank = modeStats.country_leaderboard_rank || 0;
@@ -51,6 +51,15 @@ class ModeStatsObject {
         else return "\n";
     }
 
+    addCompareAcc(nowValue, oldValue, digits = 0) {
+        const multiplier = Math.pow(10, digits);
+        let delta = (nowValue * multiplier - oldValue * multiplier) / multiplier;
+        if (delta > 0) return " \t ( +" + delta.toFixed(digits) + "% )\n";
+        else if (delta < 0) return " \t ( " + delta.toFixed(digits) + "% )\n";
+        else return "\n";
+    }
+
+
     addCompareRankedScores(nowValue, oldValue) {
         let delta = nowValue - oldValue;
         if (delta > 0) return " \t ( +" + utils.format_number(delta) + " )\n";
@@ -77,7 +86,7 @@ class ModeStatsObject {
      * @param {ModeStatsObject} oldModeStats
      */
     compareTo(oldModeStats) {
-        const dAccuracy = this.addCompareString(this.accuracy, oldModeStats.accuracy, 4);
+        const dAccuracy = this.addCompareAcc(this.accuracy, oldModeStats.accuracy, 2);
         const dPlaycount = this.addCompareString(this.playcount, oldModeStats.playcount);
         const dLevel = this.addCompareString(this.level, oldModeStats.level, 2);
         //const dCountryRank = this.addCompareString(this.countryRank, oldModeStats.countryRank);

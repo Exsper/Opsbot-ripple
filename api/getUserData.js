@@ -1,7 +1,7 @@
 "use strict";
 
 const UserObject = require("./objects/UserObject");
-const UserInfo = require("../user/UserInfo");
+const UserInfo = require("./UserInfo"); // 这里UserInfo不知道为什么要复制另外一份才正常
 const RippleApi = require("./RippleApiRequest");
 const SimpleUserObject = require("./objects/SimpleUserObject");
 
@@ -13,7 +13,7 @@ class getUserData {
     }
 
     async getUserObject(nedb) {
-        const rippleUser = (this.isRX) ? await RippleApi.getUsersFullRx(this.apiObject) : await RippleApi.getUsersFull(this.apiObject);
+        const rippleUser = (this.isRX) ? await RippleApi.getUsersFullRx(this.apiObject, this.host) : await RippleApi.getUsersFull(this.apiObject, this.host);
         if (rippleUser.code === 404) throw "找不到玩家 " + JSON.stringify(this.apiObject);
         if (rippleUser.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
         if (rippleUser.code === "error") throw "获取玩家出错 " + JSON.stringify(this.apiObject);
@@ -24,7 +24,7 @@ class getUserData {
     }
 
     async getSimpleUserObject() {
-        const rippleUser = await RippleApi.getUsers(this.apiObject);
+        const rippleUser = await RippleApi.getUsers(this.apiObject, this.host);
         if (rippleUser.code === 404) throw "找不到玩家 " + JSON.stringify(this.apiObject);
         if (rippleUser.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
         if (rippleUser.code === "error") throw "获取玩家出错 " + JSON.stringify(this.apiObject);

@@ -12,7 +12,7 @@ class getBestScoresData {
     }
 
     async getBestScoresObject(simpleUserObject) {
-        const result = (this.isRX) ? await RippleApi.getBestsRx(this.apiObject) : await RippleApi.getBests(this.apiObject);
+        const result = (this.isRX) ? await RippleApi.getBestsRx(this.apiObject, this.host) : await RippleApi.getBests(this.apiObject, this.host);
         if (result.code === 404) throw "找不到成绩 " + JSON.stringify(this.apiObject);
         if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
         if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);

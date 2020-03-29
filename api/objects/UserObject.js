@@ -40,6 +40,7 @@ class UserObject {
      * @param {Boolean} isRx
      */
     tocompareString(oldUserObject, mode = this.favourite_mode, isRx) {
+        if (!oldUserObject) oldUserObject = this;
         let output = "";
         output = output + this.username + " 的 " + utils.getModeString(mode) + " 详细信息：\n";
         if (isRx) output = output + "模式：Relax\n";

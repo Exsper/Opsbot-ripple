@@ -67,7 +67,7 @@ class Command {
     }
 
     async getUserInfo(nedb) {
-        this.userInfo = await UserInfo.getUserOsuInfo(this.meta.userId, nedb);
+        this.userInfo = await new UserInfo(this.host).getUserOsuInfo(this.meta.userId, nedb);
     }
 
     getNoArgErrorMessage(argName, argNecessity) {
@@ -95,12 +95,10 @@ class Command {
         let argsName = commandInfo.args;
         /**@type {Array<-1|0|1>}  2：必须直接提供 1：user，必须提供，省略时从存储中寻找 0：mods，可省略，省略时从存储中寻找，如果找不到则省略 -1：可省略 */
         let argNecessity = commandInfo.argNecessity;
-        // 该指令不需要任何参数（并不是消息中没有参数）
-        if (argsName.length <= 0) return new Arg(args); // getOsuApiObject = [{}]
-        // 如果有需要从数据库获取的参数，先去获取
-        if (argNecessity.indexOf(0) >= 0 || commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx") await this.getUserInfo(nedb);
+        // 先去获取数据库
+        await this.getUserInfo(nedb);
         // me指令没有userId参数，默认是绑定账号，只为了兼容白菜指令，不要它代码会更简洁一点
-        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx") args.userStringWithoutBeatmap = this.userInfo.osuId;
+        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "bot_unbind" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
         argsName.map((argName, index) => {
             let ar = regs[argName].exec(this.argString);
             if (ar === null) {
@@ -113,6 +111,12 @@ class Command {
                     else if (argsName[index] === "onlyModeString" && this.userInfo.defaultMode) args.onlyModeString = this.userInfo.defaultMode;
                     else throw this.getNoArgErrorMessage(argsName[index], 1);
                 }
+                else if (argNecessity[index] === 0) {
+                    if (argsName[index] === "userStringWithoutBeatmap" && this.userInfo.osuId > 0) args.userStringWithoutBeatmap = this.userInfo.osuId;
+                    else if (argsName[index] === "userStringWithBeatmap" && this.userInfo.osuId > 0) args.userStringWithBeatmap = this.userInfo.osuId;
+                    else if (argsName[index] === "modeString" && this.userInfo.defaultMode) args.modeString = this.userInfo.defaultMode;
+                    else if (argsName[index] === "onlyModeString" && this.userInfo.defaultMode) args.onlyModeString = this.userInfo.defaultMode;
+                }
             }
             else {
                 args[argName] = ar[1];
@@ -122,21 +126,32 @@ class Command {
     }
 
 
-    getHelp(commands) {
+    getHelp(prefix, commands) {
         let output = ""
         if (!this.argString) {
             output = output + "osu.ppy.sb 专用查询\n";
-            output = output + "呜哇，好多不想写，反正就和白菜差不多嘛\n";
-            output = output + "查relax模式就在指令后加rx\n";
-            output = output + "基本指令有：" + commands.reduce((acc, cur) => { return acc + cur.command[0] + "/" }, "");
+            output = output + prefix + "setid 绑定账号\n";
+            output = output + prefix + "mode 设置默认模式\n";
+            output = output + prefix + "stat/statrx 查状态\n";
+            output = output + prefix + "bp/bprx 查bp\n";
+            output = output + prefix + "me 查自己成绩\n";
+            output = output + prefix + "pr/recent 查最近成绩\n";
+            output = output + prefix + "prrx/recentrx 查最近relax成绩\n";
+            output = output + prefix + "score 查成绩\n";
+            output = output + prefix + "top/vstop 查#1成绩\n";
+            output = output + "\n";
+            output = output + prefix + "score查成绩时谱面名和玩家名之间要用|分隔\n";
+            output = output + prefix + "score查成绩时玩家名用/分割可以同时查询多玩家的成绩\n";
+            output = output + prefix + "help + 指令 可以查询该指令详细信息\n";
+            // output = output + "基本指令有：" + commands.reduce((acc, cur) => { return acc + cur.command[0] + "/" }, "");
             return output;
         }
         // 查找指令
         for (let com of commands) {
             if (com.command.includes(this.argString)) {
-                output = output + commands.info + "\n";
-                output = output + "指令：" + commands.command.join("/") + "\n";
-                output = output + "参数：" + commands.argsInfo;
+                output = output + com.info + "\n";
+                output = output + "指令：" + com.command.join("/") + "\n";
+                output = output + "参数：" + com.argsInfo;
                 return output;
             }
         }
@@ -149,49 +164,55 @@ class Command {
      * @param {nedb} nedb 
      */
     async execute(commandsInfo, nedb) {
-        if (!this.cutPrefix(commandsInfo.prefix, commandsInfo.prefix2)) return ""; // 非指定前缀
-        if (!this.cutCommand(commandsInfo.commandReg)) return ""; // 指令格式不正确
-        // 帮助
-        if (this.commandString === "help") {
-            return this.getHelp();
-        }
-        // 查找指令
-        // score api暂不能获取rx模式成绩！！
-        const commands = commandsInfo.commands;
-        for (let com of commands) {
-            if (com.command.includes(this.commandString)) {
-                let arg = await this.getArgObject(com, commandsInfo.regs, nedb);
-                let type = com.type;
-                switch (type) {
-                    case 'api_beatmap': return await this.getApiBeatmapInfo(arg);
-                    case 'api_user': return await this.getApiUserInfo(arg, false, nedb);
-                    case 'api_user_rx': return await this.getApiUserInfo(arg, true, nedb);
-                    case 'api_score': 
-                    case 'api_score_me': return await this.getApiScoreInfo(arg, false, false, false);
-                    case 'api_score_rx':
-                    case 'api_score_me_rx': return await this.getApiScoreInfo(arg, true, false, false);
-                    case 'api_score_top': return await this.getApiScoreInfo(arg, false, true, false);
-                    case 'api_score_top_rx': return await this.getApiScoreInfo(arg, true, true, false);
-                    case 'api_score_vstop': return await this.getApiScoreInfo(arg, false, false, true);
-                    case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true);
-                    case 'api_bp': return this.getApiBpInfo(arg, false);
-                    case 'api_bp_rx': return this.getApiBpInfo(arg, true);
-                    case 'api_recent': return this.getApiRecentInfo(arg, false, false);
-                    case 'api_recent_rx': return this.getApiRecentInfo(arg, true, false);
-                    case 'api_recent_passed': return this.getApiRecentInfo(arg, false, true);
-                    case 'api_recent_passed_rx': return this.getApiRecentInfo(arg, true, true);
-                    case 'bot_bind': return this.getBotBindInfo(arg, nedb);
-                    case 'bot_unbind': return this.getBotUnbindInfo(nedb);
-                    case 'bot_setmode': return this.getBotSetmodeInfo(arg, nedb);
-                    default: return "当你看到这条信息说明指令处理代码有bug惹";
+        try {
+            if (!this.cutPrefix(commandsInfo.prefix, commandsInfo.prefix2)) return ""; // 非指定前缀
+            if (!this.cutCommand(commandsInfo.commandReg)) return ""; // 指令格式不正确
+            // 帮助
+            if (this.commandString === "help") {
+                return this.getHelp(commandsInfo.prefix, commandsInfo.commands);
+            }
+            // 查找指令
+            // score api暂不能获取rx模式成绩！！
+            const commands = commandsInfo.commands;
+            for (let com of commands) {
+                if (com.command.includes(this.commandString)) {
+                    let arg = await this.getArgObject(com, commandsInfo.regs, nedb);
+                    let type = com.type;
+                    switch (type) {
+                        case 'api_beatmap': return await this.getApiBeatmapInfo(arg);
+                        case 'api_user': return await this.getApiUserInfo(arg, false, nedb);
+                        case 'api_user_rx': return await this.getApiUserInfo(arg, true, nedb);
+                        case 'api_score':
+                        case 'api_score_me': return await this.getApiScoreInfo(arg, false, false, false);
+                        // case 'api_score_rx':
+                        // case 'api_score_me_rx': return await this.getApiScoreInfo(arg, true, false, false);
+                        case 'api_score_top': return await this.getApiScoreInfo(arg, false, true, false);
+                        // case 'api_score_top_rx': return await this.getApiScoreInfo(arg, true, true, false);
+                        case 'api_score_vstop': return await this.getApiScoreInfo(arg, false, false, true);
+                        // case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true);
+                        case 'api_bp': return this.getApiBpInfo(arg, false);
+                        case 'api_bp_rx': return this.getApiBpInfo(arg, true);
+                        case 'api_recent': return this.getApiRecentInfo(arg, false, false);
+                        case 'api_recent_rx': return this.getApiRecentInfo(arg, true, false);
+                        case 'api_recent_passed': return this.getApiRecentInfo(arg, false, true);
+                        case 'api_recent_passed_rx': return this.getApiRecentInfo(arg, true, true);
+                        case 'bot_bind': return this.getBotBindInfo(arg, nedb);
+                        case 'bot_unbind': return this.getBotUnbindInfo(nedb);
+                        case 'bot_setmode': return this.getBotSetmodeInfo(arg, nedb);
+                        default: return "当你看到这条信息说明指令处理代码有bug惹";
+                    }
                 }
             }
+            return ""; // 找不到该指令
         }
-        return ""; // 找不到该指令
+        catch (ex) {
+            return ex;
+        }
     }
 
     async getApiBeatmapInfo(arg) {
-        let apiObjects = await arg.getBeatmapId().getOsuApiObject();
+        let arg2 = await arg.getBeatmapId();
+        let apiObjects = arg2.getOsuApiObject();
         return await new getBeatmapData(this.host, apiObjects).output();
     }
 
@@ -201,7 +222,8 @@ class Command {
     }
 
     async getApiScoreInfo(arg, isRX, isTop, isVsTop) {
-        let apiObjects = await arg.getBeatmapId().getOsuApiObject();
+        let arg2 = await arg.getBeatmapId();
+        let apiObjects = arg2.getOsuApiObject();
         return await new getScoreData(this.host, apiObjects, isRX, isTop, isVsTop).output();
     }
 

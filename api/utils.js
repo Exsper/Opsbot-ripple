@@ -14,6 +14,7 @@ class utils {
         // if (second>0) output = output + second + "秒";
         return output;
     }
+
     // 整数每3位加逗号
     static format_number(n) {
         var b = parseInt(n).toString();
@@ -21,6 +22,53 @@ class utils {
         if (len <= 3) { return b; }
         var r = len % 3;
         return r > 0 ? b.slice(0, r) + "," + b.slice(r, len).match(/\d{3}/g).join(",") : b.slice(r, len).match(/\d{3}/g).join(",");
+    }
+
+    // enabled_mods转为mods数组
+    static getScoreMods(enabledMods) {
+        let raw_mods = parseInt(enabledMods);
+        const Mods = {
+            'None': 0,
+            'NoFail': 1,
+            'Easy': 1 << 1,
+            'TouchDevice': 1 << 2,
+            'Hidden': 1 << 3,
+            'HardRock': 1 << 4,
+            'SuddenDeath': 1 << 5,
+            'DoubleTime': 1 << 6,
+            'Relax': 1 << 7,
+            'HalfTime': 1 << 8,
+            'Nightcore': 1 << 9, // DoubleTime
+            'Flashlight': 1 << 10,
+            'Autoplay': 1 << 11,
+            'SpunOut': 1 << 12,
+            'Relax2': 1 << 13, // Autopilot
+            'Perfect': 1 << 14, // SuddenDeath
+            'Key4': 1 << 15,
+            'Key5': 1 << 16,
+            'Key6': 1 << 17,
+            'Key7': 1 << 18,
+            'Key8': 1 << 19,
+            'FadeIn': 1 << 20,
+            'Random': 1 << 21,
+            'Cinema': 1 << 22,
+            'Target': 1 << 23,
+            'Key9': 1 << 24,
+            'KeyCoop': 1 << 25,
+            'Key1': 1 << 26,
+            'Key3': 1 << 27,
+            'Key2': 1 << 28,
+            'ScoreV2': 1 << 29,
+            'Mirror': 1 << 30,
+            'KeyMod': 521109504,
+            'FreeModAllowed': 522171579,
+            'ScoreIncreaseMods': 1049662
+        };
+        let modsArr = [];
+        for (const mod in Mods) {
+            if (raw_mods & Mods[mod]) modsArr.push(mod);
+        }
+        return modsArr;
     }
 
     // enabled_mods转为字符串
@@ -58,7 +106,7 @@ class utils {
                 case "Key9": { abbMods.push("9K"); break; }
                 case "ScoreV2": { hasV2 = true; break; }
                 case "Relax": { hasRelax = true; break; }
-                default: { abbMods.push(modsArr[i]); break; }
+                // default: { abbMods.push(modsArr[i]); break; }
             }
         }
         // 有NC时去掉DT

@@ -1,6 +1,6 @@
 "use strict";
 
-const OsusearchApiRequest = require("../api/OsusearchApiRequest");
+const OsusearchApi = require("../api/OsusearchApiRequest");
 
 /**
  * 指令参数对象
@@ -109,7 +109,7 @@ class Arg {
      * @returns {0|1|2|3}
      */
     getMode(modeString) {
-        let s = modeString.trim().toLowerCase();
+        let s = modeString.toString().trim().toLowerCase();
         if (s === "0" || s === "1" || s === "2" || s === "3") return parseInt(s);
         else if (s.indexOf("std") >= 0) return 0;
         else if (s.indexOf("standard") >= 0) return 0;
@@ -207,15 +207,15 @@ class Arg {
                 option.u = singleuser;
             }
             if (this.beatmapId > 0) option.b = this.beatmapId;
-            if (this.mode) option.m = this.mode;
-            if (this.mods) option.mods = this.mods;
+            if (this.mode || this.mode === 0) option.m = this.mode;
+            if (this.mods || this.mods === 0) option.mods = this.mods;
             if (this.limit) option.limit = this.limit;
             return option;
         });
         else {
             if (this.beatmapId > 0) options[0].b = this.beatmapId;
-            if (this.mode) options[0].m = this.mode;
-            if (this.mods) options[0].mods = this.mods;
+            if (this.mode || this.mode === 0) options[0].m = this.mode;
+            if (this.mods || this.mods === 0) options[0].mods = this.mods;
             if (this.limit) options[0].limit = this.limit;
         }
         return options;
@@ -226,8 +226,9 @@ class Arg {
      * @returns {Arg} this
      */
     async getBeatmapId() {
+        if (this.beatmapId > 0) return this;
         if (Object.keys(this.beatmapSearchInfo).length <= 0) return this;
-        let id = await OsusearchApiRequest.search(this.beatmapSearchInfo);
+        let id = await OsusearchApi.search(this.beatmapSearchInfo);
         if (typeof id === "number") {
             this.beatmapId = id;
         }
