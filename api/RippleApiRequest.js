@@ -126,7 +126,7 @@ class RippleApi {
     static async getRecent(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
-        if (options.m) data.mode = options.m;
+        if (options.m || options.m === 0) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/recent', data, host);
         return resp;
     }
@@ -138,7 +138,7 @@ class RippleApi {
     static async getRecentRx(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
-        if (options.m) data.mode = options.m;
+        if (options.m || options.m === 0) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/rxrecent', data, host);
         return resp;
     }
@@ -150,7 +150,7 @@ class RippleApi {
     static async getBests(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
-        if (options.m) data.mode = options.m;
+        if (options.m || options.m === 0) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/best', data, host);
         return resp;
     }
@@ -162,7 +162,7 @@ class RippleApi {
     static async getBestsRx(options, host) {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
-        if (options.m) data.mode = options.m;
+        if (options.m || options.m === 0) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/rxbest', data, host);
         return resp;
     }
@@ -177,7 +177,7 @@ class RippleApi {
         let data = {};
         if (options.b) data.b = options.b;
         if (options.limit) data.l = options.limit;
-        if (options.m) data.mode = options.m;
+        if (options.m || options.m === 0) data.mode = options.m;
         const resp = await this.apiCall('/scores', data, host);
         return resp;
     }

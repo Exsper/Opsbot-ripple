@@ -35,8 +35,8 @@ class Arg {
         if (args.userStringWithBeatmap) this.users = this.getUsers(args.userStringWithBeatmap);
         if (args.userStringWithoutBeatmap) this.users = this.getUsers(args.userStringWithoutBeatmap);
         if (args.modsString) this.mods = this.getEnabledModsValue(args.modsString);
-        if (args.modeString) this.mode = this.getMode(args.modeString);
-        if (args.onlyModeString) this.mode = this.getMode(args.onlyModeString);
+        if (args.modeString || args.modeString === 0) this.mode = this.getMode(args.modeString);
+        if (args.onlyModeString || args.onlyModeString === 0) this.mode = this.getMode(args.onlyModeString);
         if (args.limitString) this.limit = parseInt(args.limitString);
     }
 
@@ -196,7 +196,7 @@ class Arg {
     getOsuApiObject() {
         let users = this.users;
         let options = [];
-        if (users.length > 0) options = users.map(singleuser => {
+        if (users && users.length > 0) options = users.map(singleuser => {
             let option = {};
             if ((singleuser.length > 4) && (singleuser.substring(0, 1) === "\"") && (singleuser.substring(singleuser.length - 1) === "\"")) {
                 // 带引号强制字符串形式
@@ -213,10 +213,12 @@ class Arg {
             return option;
         });
         else {
-            if (this.beatmapId > 0) options[0].b = this.beatmapId;
-            if (this.mode || this.mode === 0) options[0].m = this.mode;
-            if (this.mods || this.mods === 0) options[0].mods = this.mods;
-            if (this.limit) options[0].limit = this.limit;
+            let option = {};
+            if (this.beatmapId > 0) option.b = this.beatmapId;
+            if (this.mode || this.mode === 0) option.m = this.mode;
+            if (this.mods || this.mods === 0) option.mods = this.mods;
+            if (this.limit) option.limit = this.limit;
+            options.push(option);
         }
         return options;
     }

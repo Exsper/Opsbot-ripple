@@ -64,7 +64,7 @@ class BeatmapObject {
             else if (scoremode === 2) diff = " ★" + this.difficulty2.ctb;
             else if (scoremode === 3) diff = " ★" + this.difficulty2.mania;
             else diff = " ★" + this.difficulty;
-            const scoreModeString = (scoremode) ? utils.getModeString(scoremode) : "";
+            const scoreModeString = (scoremode || scoremode === 0) ? utils.getModeString(scoremode) : "";
             return "谱面 " + this.beatmapId + " " + this.songName + diff + " 的" + scoreModeString + "成绩：\n";
         }
         else {

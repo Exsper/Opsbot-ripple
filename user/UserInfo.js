@@ -90,11 +90,11 @@ class UserInfo {
                 }
                 await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
                 output = output + "绑定账号" + userObject.username + "成功";
-                if (apiObject.m) {
+                if (apiObject.m || apiObject.m === 0) {
                     output = output + "，默认模式设置为" + utils.getModeString(apiObject.m);
                     await nedb.update({ userId: userId }, { $set: { defaultMode: apiObject.m } });
                 }
-                else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
+                else await nedb.update({ userId: userId }, { $set: { defaultMode: 0 } });
                 return output;
             }
             return output + "数据库出错惹！";
@@ -130,10 +130,10 @@ class UserInfo {
     async getUserOsuInfo(qqId, nedb) {
         let res = await nedb.findOne({ qqId: qqId });
         if (res) {
-            let defaultMode = res.defaultMode || "";
+            let defaultMode = res.defaultMode || 0;
             return { qqId: qqId, osuId: res.userId, osuName: res.userName, defaultMode: defaultMode };
         }
-        else return { qqId: qqId, osuId: -1, osuName: "", defaultMode: "" };
+        else return { qqId: qqId, osuId: -1, osuName: "", defaultMode: -1 };
     }
 }
 

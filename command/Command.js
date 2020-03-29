@@ -98,7 +98,7 @@ class Command {
         // 先去获取数据库
         await this.getUserInfo(nedb);
         // me指令没有userId参数，默认是绑定账号，只为了兼容白菜指令，不要它代码会更简洁一点
-        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "bot_unbind" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
+        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "api_score_vstop" || commandInfo.type === "bot_unbind" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
         argsName.map((argName, index) => {
             let ar = regs[argName].exec(this.argString);
             if (ar === null) {
@@ -107,15 +107,15 @@ class Command {
                 else if (argNecessity[index] === 1) {
                     if (argsName[index] === "userStringWithoutBeatmap" && this.userInfo.osuId > 0) args.userStringWithoutBeatmap = this.userInfo.osuId;
                     else if (argsName[index] === "userStringWithBeatmap" && this.userInfo.osuId > 0) args.userStringWithBeatmap = this.userInfo.osuId;
-                    else if (argsName[index] === "modeString" && this.userInfo.defaultMode) args.modeString = this.userInfo.defaultMode;
-                    else if (argsName[index] === "onlyModeString" && this.userInfo.defaultMode) args.onlyModeString = this.userInfo.defaultMode;
+                    else if (argsName[index] === "modeString" && (this.userInfo.defaultMode || this.userInfo.defaultMode === 0)) args.modeString = this.userInfo.defaultMode;
+                    else if (argsName[index] === "onlyModeString" && (this.userInfo.defaultMode || this.userInfo.defaultMode === 0)) args.onlyModeString = this.userInfo.defaultMode;
                     else throw this.getNoArgErrorMessage(argsName[index], 1);
                 }
                 else if (argNecessity[index] === 0) {
                     if (argsName[index] === "userStringWithoutBeatmap" && this.userInfo.osuId > 0) args.userStringWithoutBeatmap = this.userInfo.osuId;
                     else if (argsName[index] === "userStringWithBeatmap" && this.userInfo.osuId > 0) args.userStringWithBeatmap = this.userInfo.osuId;
-                    else if (argsName[index] === "modeString" && this.userInfo.defaultMode) args.modeString = this.userInfo.defaultMode;
-                    else if (argsName[index] === "onlyModeString" && this.userInfo.defaultMode) args.onlyModeString = this.userInfo.defaultMode;
+                    else if (argsName[index] === "modeString" && (this.userInfo.defaultMode || this.userInfo.defaultMode === 0)) args.modeString = this.userInfo.defaultMode;
+                    else if (argsName[index] === "onlyModeString" && (this.userInfo.defaultMode || this.userInfo.defaultMode === 0)) args.onlyModeString = this.userInfo.defaultMode;
                 }
             }
             else {

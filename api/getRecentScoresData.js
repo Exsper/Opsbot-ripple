@@ -33,13 +33,14 @@ class getRecentScoresData {
 
     async output() {
         try {
+            if (!this.isPassed) this.apiObject.limit = 1;
             let simpleUserObject = await this.getSimpleUserObject();
             let scoreObjects = await this.getRecentScoresObject(simpleUserObject);
             if (this.isPassed) {
                 let output = "";
                 // 寻找completed标签>0的
                 for (var i = 0; i < scoreObjects.length; i++) {
-                    if (scoreObjects[i].completed >0) {
+                    if (scoreObjects[i].completed > 0) {
                         output = output + scoreObjects[i].beatmap.toScoreTitle(scoreObjects[i].mode);
                         output = output + scoreObjects[i].toCompleteString();
                         return output;
