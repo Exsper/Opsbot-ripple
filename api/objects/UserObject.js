@@ -34,21 +34,16 @@ class UserObject {
         return this;
     }
 
-    toString(mode = this.favourite_mode) {
-        let output = "";
-        output = output + this.username + " 的 " + utils.getModeString(mode) + " 详细信息：\n";
-        output = output + "id：" + this.userId + "\n";
-        output = output + this.modeStats[parseInt(mode)].toString();
-        return output;
-    }
-
     /**
      * @param {UserObject} oldUserObject 
      * @param {String|Number} mode 
+     * @param {Boolean} isRx
      */
-    tocompareString(oldUserObject, mode = this.favourite_mode) {
+    tocompareString(oldUserObject, mode = this.favourite_mode, isRx) {
         let output = "";
         output = output + this.username + " 的 " + utils.getModeString(mode) + " 详细信息：\n";
+        if (isRx) output = output + "模式：Relax\n";
+        else output = output + "模式：Classic\n";
         output = output + "id：" + this.userId + "\n";
         output = output + this.modeStats[parseInt(mode)].compareTo(oldUserObject.modeStats[parseInt(mode)]);
         output = output + "\n";

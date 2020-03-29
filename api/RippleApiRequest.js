@@ -100,6 +100,16 @@ class RippleApi {
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
+    static async getUsersFullRx(options, host) {
+        let data = this.setIdOrName(options);
+        const resp = await this.apiCall('/users/rxfull', data, host);
+        return resp;
+    }
+
+	/**
+	 * @param {Object} options apiOptions格式（osu api参数格式）
+	 * @returns {Promise<Object>} The response body
+	 */
     static async getUserId(options, host) {
         let data = { name: options.u };
         const resp = await this.apiCall('/whatid', data, host);
@@ -151,6 +161,21 @@ class RippleApi {
         if (options.limit) data.l = options.limit;
         if (options.m) data.mode = options.m;
         const resp = await this.apiCall('/users/scores/rxbest', data, host);
+        return resp;
+    }
+
+	/**
+     * 暂不支持查relax成绩！！
+	 * @param {Object} options apiOptions格式（osu api参数格式）
+	 * @returns {Promise<Object>} The response body
+	 */
+    static async getScores(options, host) {
+        // 没法查指定人，u用不着了
+        let data = {};
+        if (options.b) data.b = options.b;
+        if (options.limit) data.l = options.limit;
+        if (options.m) data.mode = options.m;
+        const resp = await this.apiCall('/scores', data, host);
         return resp;
     }
 

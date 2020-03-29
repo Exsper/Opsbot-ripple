@@ -1,3 +1,5 @@
+"use strict";
+
 const UserObject = require("../api/objects/UserObject");
 const getUserData = require("../api/getUserData");
 const utils = require('../api/utils');
@@ -66,35 +68,40 @@ class UserInfo {
 
     // 绑定qqId
     async bindUser(nedb, qqId, apiObject) {
-        let output = "";
-        // 检查是否绑定过
-        let res = await nedb.findOne({ qqId: qqId });
-        if (res) {
-            // 绑定过，删除原来的qqId和defaultMode
-            output = output + "警告：您将自动与 " + res.userName + " 解除绑定\n";
-            await nedb.update({ qqId: qqId }, { $unset: { qqId: true, defaultMode: true } });
-        }
-        let userObject = await new getUserData(this.host, apiObject, false).getUserObject(nedb);
-        if (typeof userObject === "string") return userObject; // 报错消息
-        // 这时数据库已记录该玩家，添加qqId字段即可
-        // 检查该玩家是否已被绑定其他玩家
-        let userId = userObject.userId;
-        let res2 = await nedb.findOne({ userId: userId });
-        if (res2) {
-            if (res2.qqId) {
-                // 正在绑定其他QQ
-                output = output + "警告：自动解除该玩家与QQ " + res2.qqId + " 的绑定\n";
+        try {
+            let output = "";
+            // 检查是否绑定过
+            let res = await nedb.findOne({ qqId: qqId });
+            if (res) {
+                // 绑定过，删除原来的qqId和defaultMode
+                output = output + "警告：您将自动与 " + res.userName + " 解除绑定\n";
+                await nedb.update({ qqId: qqId }, { $unset: { qqId: true, defaultMode: true } });
             }
-            await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
-            output = output + "绑定账号" + userObject.username + "成功";
-            if (apiObject.m) {
-                output = output + "，默认模式设置为" + utils.getModeString(apiObject.m);
-                await nedb.update({ userId: userId }, { $set: { defaultMode: apiObject.m } });
+            let userObject = await new getUserData(this.host, apiObject, false).getUserObject(nedb);
+
+            // 这时数据库已记录该玩家，添加qqId字段即可
+            // 检查该玩家是否已被绑定其他玩家
+            let userId = userObject.userId;
+            let res2 = await nedb.findOne({ userId: userId });
+            if (res2) {
+                if (res2.qqId) {
+                    // 正在绑定其他QQ
+                    output = output + "警告：自动解除该玩家与QQ " + res2.qqId + " 的绑定\n";
+                }
+                await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
+                output = output + "绑定账号" + userObject.username + "成功";
+                if (apiObject.m) {
+                    output = output + "，默认模式设置为" + utils.getModeString(apiObject.m);
+                    await nedb.update({ userId: userId }, { $set: { defaultMode: apiObject.m } });
+                }
+                else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
+                return output;
             }
-            else await nedb.update({ userId: userId }, { $set: { defaultMode: "0" } });
-            return output;
+            return output + "数据库出错惹！";
         }
-        return output + "数据库出错惹！";
+        catch (ex) {
+            return ex;
+        }
     }
 
     // 解绑QQ

@@ -1,170 +1,111 @@
+"use strict";
+
 const ScoreObject = require("./objects/ScoreObject");
 const getBeatmapData = require("./getBeatmapData");
-const utils = require('./utils');
+const RippleApi = require("./RippleApiRequest");
 
-
+// 用ripple获取玩家成绩
+// api暂不能获取rx模式成绩！！
 class getScoreData {
-    async getScoreObjects(osuApi, argObject) {
-        const scores = await osuApi.getScores(argObject);
-        if (scores.code === 404) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
-        if (scores.code === "error") return "获取成绩出错 " + JSON.stringify(argObject) + "\n";
-        if (scores.length <= 0) return "找不到成绩 " + JSON.stringify(argObject) + "\n";
-        let scoreObjects = scores.map(item => { return new ScoreObject(item); });
+    constructor(host, apiObjects, isRX, isTop, isVsTop) {
+        this.host = host;
+        this.apiObjects = apiObjects;
+        this.isRX = isRX;
+        this.isTop = isTop;
+        this.isVsTop = isVsTop;
+    }
+
+    async getScoreObjects(argObject, beatmapObject) {
+        const result = await RippleApi.getScores(argObject);
+        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(argObject);
+        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(argObject);
+        let scores = result.scores;
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(argObject);
+        let scoreObjects = scores.map(item => { return new ScoreObject(item, beatmapObject, null); });
         return scoreObjects;
     }
 
-    async getOneScoreBeatmapData(osuApi, scoreObject, argObject) {
+    async getBeatmapObject() {
         // 获取beatmapObject
+        let argObject = this.apiObjects[0];
         let beatmapArgObject = {};
-        if (scoreObject.beatmap_id) beatmapArgObject.b = scoreObject.beatmap_id;
-        else if (argObject.b) beatmapArgObject.b = argObject.b;
+        beatmapArgObject.b = argObject.b;
         if (argObject.m) beatmapArgObject.m = argObject.m;
         if (argObject.a) beatmapArgObject.a = argObject.a;
-        // 获取acc
-        if (beatmapArgObject.b) {
-            const beatmapObject = await new getBeatmapData().getBeatmapObject(osuApi, beatmapArgObject);
-            if (typeof beatmapObject === "string") return { scoreObject: scoreObject, beatmapObject: null }; // 报错消息
-            if (beatmapArgObject.m) scoreObject.addMode(beatmapArgObject.m);
-            return { scoreObject: scoreObject, beatmapObject: beatmapObject };
-        }
-        else return { scoreObject: scoreObject, beatmapObject: null };
+        return await new getBeatmapData(this.host, beatmapArgObject).getBeatmapObject();
     }
 
-    async getScoreBeatmapData(osuApi, scoreObjects, argObject) {
-        // 获取beatmapObject
-        let beatmapArgObject = {};
-        if (scoreObjects[0].beatmap_id) beatmapArgObject.b = scoreObjects[0].beatmap_id;
-        else if (argObject.b) beatmapArgObject.b = argObject.b;
-        if (argObject.m) beatmapArgObject.m = argObject.m;
-        if (argObject.a) beatmapArgObject.a = argObject.a;
-        // 获取acc
-        if (beatmapArgObject.b) {
-            const beatmapObject = await new getBeatmapData().getBeatmapObject(osuApi, beatmapArgObject);
-            if (typeof beatmapObject === "string") return { scoreObjects: scoreObjects, beatmapObject: null }; // 报错消息
-            for (let i = 0, len = scoreObjects.length; i < len; i++) {
-                if (beatmapArgObject.m) scoreObjects[i].addMode(beatmapArgObject.m);
-                scoreObjects[i].addAcc(beatmapObject);
+    /**
+     * 从结果中寻找指定玩家成绩
+     * @param {Array<ScoreObject>} scoreObjects 
+     * @param {Array<String>} userIds id或name的字符串格式
+     * @returns {ScoreObject|null}
+     */
+    searchUsersScore(scoreObjects, userIds) {
+        let searchResult = [];
+        for (var i = 0; i < scoreObjects.length; i++) {
+            let thisScoreUserId = scoreObjects[i].user.id.toString();
+            let thisScoreUserName = scoreObjects[i].user.username;
+            let findIndex = userIds.indexOf(thisScoreUserId);
+            let findIndex2 = userIds.indexOf(thisScoreUserName);
+            if (findIndex >= 0) {
+                searchResult.push(scoreObjects[i]);
+                userIds.splice(findIndex, 1);
+                if (findIndex2 >= 0) userIds.splice(findIndex2, 1); // 防userIds重复
             }
-            return { scoreObjects: scoreObjects, beatmapObject: beatmapObject };
-        }
-        else return { scoreObjects: scoreObjects, beatmapObject: null };
-    }
-
-    outputBeatmapAndScoresString(scoreObjects, beatmapObject) {
-        let output = "";
-        if (beatmapObject) {
-            if (scoreObjects[0].mode > 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
-            else output = output + beatmapObject.toScoreTitle();
-        }
-        for (let i = 0, len = scoreObjects.length; i < len; i++) {
-            output = output + scoreObjects[i].toString();
-        }
-        return output;
-    }
-
-    async getAndOutputBeatmapAndScoresString(osuApi, scoreObjects, argObject) {
-        let so = [];
-        if (Array.isArray(scoreObjects)) so = scoreObjects;
-        else {
-            so.push(scoreObjects);
-        }
-
-        const scoreBeatmapData = await this.getScoreBeatmapData(osuApi, so, argObject);
-        so = scoreBeatmapData.scoreObjects;
-        const beatmapObject = scoreBeatmapData.beatmapObject;
-        return this.outputBeatmapAndScoresString(so, beatmapObject);
-    }
-
-    async getAndOutputBeatmapsAndScoresString(osuApi, scoreObjects, argObject) {
-        let output = "";
-        if (Array.isArray(scoreObjects)) {
-            for (let i = 0, len = scoreObjects.length; i < len; i++) {
-                output = output + await this.getAndOutputBeatmapAndScoresString(osuApi, scoreObjects[i], argObject);
+            else if (findIndex2 >= 0) {
+                searchResult.push(scoreObjects[i]);
+                if (findIndex >= 0) userIds.splice(findIndex, 1); // 防userIds重复
+                userIds.splice(findIndex2, 1);
             }
+            if (userIds.length <= 0) break;
         }
-        else {
-            output = output + await this.getAndOutputBeatmapAndScoresString(osuApi, scoreObjects, argObject);
-        }
-        return output;
+        return searchResult;
     }
 
-
-    async outputScores(osuApi, argObjects) {
-        // 用argObjects兼容多个成绩比较
-        let scoreObjects = [];
-        for (let i = 0, len = argObjects.length; i < len; i++) {
-            let items = await this.getScoreObjects(osuApi, argObjects[i]);
-            if (typeof items !== "string") scoreObjects = scoreObjects.concat(items);
+    async outputTopScore() {
+        try {
+            let beatmapObject = await this.getBeatmapObject();
+            // limit = 1 即为最高pp
+            let argObject = this.apiObjects[0];
+            argObject.limit = 1;
+            let scoreObjects = await this.getScoreObjects(argObject, beatmapObject);
+            let output = "";
+            output = output + beatmapObject.toScoreTitle(scoreObjects[0].mode);
+            output = output + scoreObjects[0].toCompleteString();
+            return output;
         }
-        if (scoreObjects.length <= 0) return "找不到成绩" + JSON.stringify(argObjects) + "\n";
-
-        return await this.getAndOutputBeatmapAndScoresString(osuApi, scoreObjects, argObjects[0]);
+        catch (ex) {
+            return ex;
+        }
     }
 
-    async outputTopScore(osuApi, argObject) {
-        // limit = 1 即为最高pp
-        let argObjects = [];
-        argObject.limit = 1;
-        argObjects.push(argObject);
-        return await this.outputScores(osuApi, argObjects);
+    async output() {
+        try {
+            if (this.isTop) return this.outputTopScore();
+            let userIds = this.apiObjects.map((apiObject) => {
+                return apiObject.u;
+            });
+            let beatmapObject = await this.getBeatmapObject();
+            let scoreObjects = await this.getScoreObjects(this.apiObjects[0], beatmapObject);
+            if (this.isVsTop) userIds.push(scoreObjects[0].user.id.toString());
+            // 如果scoreObjects每个玩家成绩唯一，即使userIds有重复也不会输出重复成绩的
+            let searchResult = this.searchUsersScore(scoreObjects, userIds);
+            if (searchResult.length <= 0) return "没找到指定玩家的成绩";
+            let output = "";
+            output = output + beatmapObject.toScoreTitle(scoreObjects[0].mode);
+            if (searchResult.length === 1) output = output + searchResult[0].toCompleteString();
+            else {
+                searchResult.map((scoreObject) => {
+                    output = output + scoreObject.toString() + "\n";
+                });
+            }
+            return output;
+        }
+        catch (ex) {
+            return ex;
+        }
     }
-
-
-    async outputVsTopScore(osuApi, argObject) {
-        let scoreObjects = [];
-        const yourScoreObjects = await this.getScoreObjects(osuApi, argObject);
-        if (typeof yourScoreObjects === "string") return yourScoreObjects; // 报错消息
-        scoreObjects.push(yourScoreObjects[0]);
-        let yourPP = yourScoreObjects[0].pp;
-        let yourName = yourScoreObjects[0].username;
-
-        let topArgObject = argObject;
-        topArgObject.limit = 1;
-        delete topArgObject.u;
-        const topScoreObjects = await this.getScoreObject(osuApi, topArgObject);
-        if (typeof topScoreObjects === "string") return topScoreObjects; // 报错消息
-        scoreObjects.push(topScoreObjects[0]);
-        let topPP = topScoreObjects[0].pp;
-        let topName = topScoreObjects[0].username;
-
-        const scoreBeatmapData = await this.getScoreBeatmapData(osuApi, scoreObjects, argObject);
-        scoreObjects = scoreBeatmapData.scoreObjects;
-        const beatmapObject = scoreBeatmapData.beatmapObject;
-
-        let output = "";
-        if (beatmapObject) {
-            if (scoreObjects[0].mode > 0) output = output + beatmapObject.toScoreTitle(utils.getModeString(scoreObjects[0].mode));
-            else output = output + beatmapObject.toScoreTitle();
-        }
-        for (let i = 0, len = scoreObjects.length; i < len; i++) {
-            output = output + scoreObjects[i].toString();
-        }
-
-        let deltaPP = topPP - yourPP;
-        if (deltaPP > 0) {
-            output = output + yourName + " 与#1相差 " + deltaPP + " pp\n"
-        }
-        else if (yourName) {
-            if (yourName === topName) output = output + yourName + " 已经是#1了\n"
-            else output = output + yourName + " 与#1的pp相同\n"
-        }
-        return output;
-    }
-
-    outputRippleBeatmapAndScoresString(rippleScoreObjects) {
-        let rso = [];
-        if (Array.isArray(rippleScoreObjects)) rso = rippleScoreObjects;
-        else rso.push(rippleScoreObjects);
-        let output = "";
-        for (let i = 0, len = rso.length; i < len; i++) {
-            output = output + rso[i].beatmap.toScoreTitle(rso[i].getScoreModeString());
-            //output = output + rso[i].toString();
-            output = output + rso[i].toCompleteString();
-        }
-        return output;
-    }
-
-
 
 }
 

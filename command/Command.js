@@ -156,6 +156,7 @@ class Command {
             return this.getHelp();
         }
         // 查找指令
+        // score api暂不能获取rx模式成绩！！
         const commands = commandsInfo.commands;
         for (let com of commands) {
             if (com.command.includes(this.commandString)) {

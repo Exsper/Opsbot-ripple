@@ -66,6 +66,7 @@ class ModeStatsObject {
     }
 
     addCompareRank(nowValue, oldValue) {
+        if (oldValue <= 0) return "\n"; // 原先没成绩
         let delta = nowValue - oldValue;
         if (delta > 0) return " \t ( ↓" + delta + " )\n";
         else if (delta < 0) return " \t ( ↑" + delta * -1 + " )\n";

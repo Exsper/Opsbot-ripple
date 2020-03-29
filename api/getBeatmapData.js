@@ -6,20 +6,25 @@ const OsuApi = require("./ApiRequest");
 class getBeatmapData {
     constructor(host, apiObjects) {
         this.host = host;
-        this.apiObject = apiObjects[0]; // 只允许同时查一张谱面
+        this.apiObject = (Array.isArray(apiObjects)) ? apiObjects[0] : apiObjects; // 只允许同时查一张谱面
     }
 
-    async getBeatmapObject(argObject) {
-        const beatmaps = await OsuApi.getBeatmaps(argObject, this.host);
-        if (beatmaps.code === 404) return "找不到谱面 " + JSON.stringify(argObject) + "\n";
-        if (beatmaps.code === "error") return "获取谱面出错 " + JSON.stringify(argObject) + "\n";
-        if (beatmaps.length <= 0) return "找不到谱面 " + JSON.stringify(argObject) + "\n";
-        return new BeatmapObject(beatmaps[0]);
+    async getBeatmapObject() {
+        const beatmaps = await OsuApi.getBeatmaps(this.apiObject, this.host);
+        if (beatmaps.code === 404) throw "找不到谱面 " + JSON.stringify(this.apiObject);
+        if (beatmaps.code === "error") throw "获取谱面出错 " + JSON.stringify(this.apiObject);
+        if (beatmaps.length <= 0) throw "找不到谱面 " + JSON.stringify(this.apiObject);
+        return new BeatmapObject(beatmaps[0], false);
     }
 
-    async outputBeatmap(argObject) {
-        let beatmapObject = await this.getBeatmapObject(argObject);
-        return beatmapObject.toString();
+    async output() {
+        try {
+            let beatmapObject = await this.getBeatmapObject();
+            return beatmapObject.toString();
+        }
+        catch (ex) {
+            return ex;
+        }
     }
 }
 
