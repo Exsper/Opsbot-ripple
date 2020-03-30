@@ -46,11 +46,11 @@ class UserInfo {
             if (isRx) {
                 let afterRxUserObject = new UserObject().init(res.afterRxUserObject);
                 if (afterRxUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson(), true);
-                else await this.setNewDay(nedb, userId, res.afterRxUserObject, newUserObject.toJson(), false);
+                else await this.setNewDay(nedb, userId, res.afterRxUserObject, newUserObject.toJson(), true);
             }
             else {
                 let afterUserObject = new UserObject().init(res.afterUserObject);
-                if (afterUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson(), true);
+                if (afterUserObject.getDateString() === newUserObject.getDateString()) await this.updateToday(nedb, userId, newUserObject.toJson(), false);
                 else await this.setNewDay(nedb, userId, res.afterUserObject, newUserObject.toJson(), false);
             }
         }

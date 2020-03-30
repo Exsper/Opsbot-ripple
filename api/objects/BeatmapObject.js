@@ -59,11 +59,11 @@ class BeatmapObject {
     toScoreTitle(scoremode) {
         if (this.isRippleApi) { // scoremode应为score.play_mode
             let diff = "";
-            if (scoremode === 0) diff = " ★" + this.difficulty2.std;
-            else if (scoremode === 1) diff = " ★" + this.difficulty2.taiko;
-            else if (scoremode === 2) diff = " ★" + this.difficulty2.ctb;
-            else if (scoremode === 3) diff = " ★" + this.difficulty2.mania;
-            else diff = " ★" + this.difficulty;
+            if (scoremode === 0) diff = " ★" + this.difficulty2.std.toFixed(2);
+            else if (scoremode === 1) diff = " ★" + this.difficulty2.taiko.toFixed(2);
+            else if (scoremode === 2) diff = " ★" + this.difficulty2.ctb.toFixed(2);
+            else if (scoremode === 3) diff = " ★" + this.difficulty2.mania.toFixed(2);
+            else diff = " ★" + this.difficulty.toFixed(2);
             const scoreModeString = (scoremode || scoremode === 0) ? utils.getModeString(scoremode) : "";
             return "谱面 " + this.beatmapId + " " + this.songName + diff + " 的" + scoreModeString + "成绩：\n";
         }
