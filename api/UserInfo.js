@@ -59,9 +59,10 @@ class UserInfo {
     // 获取对比资料
     async getBeforeUserObject(nedb, userId, isRx) {
         let res = await nedb.findOne({ userId: userId });
-        if (res && res.beforeRxUserObject) {
-            if (isRx) return new UserObject().init(res.beforeRxUserObject);
-            return new UserObject().init(res.beforeUserObject);
+        if (res) {
+            if (isRx && res.beforeRxUserObject) return new UserObject().init(res.beforeRxUserObject);
+            if (!isRx && res.beforeUserObject) return new UserObject().init(res.beforeUserObject);
+            return undefined;
         }
         else return undefined;
     }
