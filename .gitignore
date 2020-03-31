@@ -340,5 +340,6 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-
+Opsbot-Ripple-v1.db
 database/save.db
+opsbot-settings.json

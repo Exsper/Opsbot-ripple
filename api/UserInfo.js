@@ -1,8 +1,8 @@
 "use strict";
 
-const UserObject = require("./objects/UserObject");
-const getUserData = require("./getUserData");
-const utils = require('./utils');
+const UserObject = require("../api/objects/UserObject");
+const getUserData = require("../api/getUserData");
+const utils = require('../api/utils');
 
 // 记录内容：
 // userId, userName, beforeUserObject, afterUserObject, beforeRxUserObject, afterRxUserObject, (qqId), (defaultMode), _Id(db自带)
@@ -33,11 +33,11 @@ class UserInfo {
             if (isRx) await nedb.insert({ userId: userId, userName: newUserObject.username, beforeRxUserObject: newUserObject.toJson(), afterRxUserObject: newUserObject.toJson() });
             else await nedb.insert({ userId: userId, userName: newUserObject.username, beforeUserObject: newUserObject.toJson(), afterUserObject: newUserObject.toJson() });
         }
-        else if (isRx && !res.afterRxUserObject) {
+        else if (isRx && (!res.afterRxUserObject || !res.beforeRxUserObject)) {
             // 缺少rx stat记录
             await nedb.update({ userId: userId }, { $set: { beforeRxUserObject: newUserObject.toJson(), afterRxUserObject: newUserObject.toJson() } });
         }
-        else if (!isRx && !res.afterUserObject) {
+        else if (!isRx && (!res.afterUserObject || !res.beforeUserObject)) {
             // 缺少stat记录
             await nedb.update({ userId: userId }, { $set: { beforeUserObject: newUserObject.toJson(), afterUserObject: newUserObject.toJson() } });
         }
@@ -86,11 +86,13 @@ class UserInfo {
             if (res2) {
                 if (res2.qqId) {
                     // 正在绑定其他QQ
-                    output = output + "警告：自动解除该玩家与QQ " + res2.qqId + " 的绑定\n";
+                    // output = output + "警告：自动解除该玩家与QQ " + res2.qqId + " 的绑定\n";
+                    // 防止恶意抢绑，禁止绑定
+                    return "错误：该账号已与QQ " + res2.qqId + " 绑定，如绑定错误请联系管理员\n";
                 }
                 await nedb.update({ userId: userId }, { $set: { qqId: qqId } });
                 output = output + "绑定账号" + userObject.username + "成功";
-                if (apiObject.m) {
+                if (apiObject.m || apiObject.m === 0) {
                     output = output + "，默认模式设置为" + utils.getModeString(apiObject.m);
                     await nedb.update({ userId: userId }, { $set: { defaultMode: apiObject.m } });
                 }
@@ -110,9 +112,9 @@ class UserInfo {
         if (res) {
             // 绑定过，删除原来的qqId和defaultMode
             await nedb.update({ qqId: qqId }, { $unset: { qqId: true, defaultMode: true } });
-            return "与 " + res.userName + " 成功解除绑定";
+            return qqId + " 成功解除与 " + res.userName + " 的绑定";
         }
-        else return "您还没有绑定任何账号";
+        else return qqId + " 还没有绑定任何账号";
     }
 
     // 设置默认模式

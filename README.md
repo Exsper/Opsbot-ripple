@@ -10,23 +10,29 @@ npm install Exsper/Opsbot-ripple
 
 ## usage
 ```javascript
-app.plugin(require('opsbot-ripple'), options);
+app.plugin(require('opsbot-ripple'));
 ```
 or
 ```javascript
 module.exports = {
     plugins: [
-        ['opsbot-ripple', options],
+        ['opsbot-ripple'],
     ],
 }
 ```
+### 配置文件
+第一次运行，会在插件所在目录的上上层（一般为node_modules文件夹上一层）创建配置文件：   
+```sh
+opsbot-settings.json
+```
 
-### options
+#### opsbot-settings.json
 ```javascript
 {
-    prefix : "*",    // 前缀1，可省略，默认为"*"
-    prefix2 : "%",    // 前缀2，可省略，默认为"%"
-    host : "osu.ppy.sb",    // 私服主机名，可省略，默认为"osu.ppy.sb"
-    database : "./Opsbot-Ripple-v1.db",    // 如果不存在则会自动生成，可省略，默认在根目录下
+    "admin" : [1],    // 管理员      
+    "prefix" : "*",    // 前缀1，可省略，默认为"*"
+    "prefix2" : "%",    // 前缀2，可省略，默认为"%"
+    "host" : "osu.ppy.sb",    // 私服主机名，可省略，默认为"osu.ppy.sb"
+    "database" : "./Opsbot-Ripple-v1.db"    // 如果不存在则会自动生成，可省略，默认在根目录下
 }
 ```

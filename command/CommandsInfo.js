@@ -39,7 +39,7 @@ function CommandsInfo(prefix, prefix2) {
         }, {
             type: 'api_user_rx',
             info: '玩家查询（relax模式）',
-            command: ['statrx', 'statmerx', 'urx', 'userrx', 'prx', 'playerrx'],
+            command: ['statrx', 'rxstat', 'statmerx', 'statrxme', 'rxstatme','urx', 'userrx', 'prx', 'playerrx'],
             argsInfo: '(user) (:mode)',
             args: ['userStringWithoutBeatmap', 'modeString'],
             argNecessity: [1, 0]
@@ -164,9 +164,9 @@ function CommandsInfo(prefix, prefix2) {
             type: 'bot_unbind',
             info: '解绑osu账号',
             command: ['unsetid', 'unbind', 'unset'],
-            argsInfo: '无参数',
-            args: [],
-            argNecessity: [],
+            argsInfo: '[qqId]',
+            args: ['userStringWithoutBeatmap'],
+            argNecessity: [2],
         }, {
             type: 'bot_setmode',
             info: '设置默认mode',

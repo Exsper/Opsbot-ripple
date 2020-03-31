@@ -24,7 +24,7 @@ class Command {
      * @param {Function} meta.$send 发送消息
      * @param {String} host 服务器
      */
-    constructor(meta, host = "osu.ppy.sb") {
+    constructor(meta, host = "osu.ppy.sb", admin = []) {
         this.meta = meta;
         this.host = host;
         /** @type {String} */
@@ -34,6 +34,7 @@ class Command {
         this.commandString = "";
         this.argString = "";
         this.userInfo = { qqId: meta.userId, osuId: -1, osuName: "", defaultMode: "" };
+        this.admin = admin;
     }
 
     /**
@@ -98,7 +99,7 @@ class Command {
         // 先去获取数据库
         await this.getUserInfo(nedb);
         // me指令没有userId参数，默认是绑定账号，只为了兼容白菜指令，不要它代码会更简洁一点
-        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "api_score_vstop" || commandInfo.type === "bot_unbind" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
+        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "api_score_vstop" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
         argsName.map((argName, index) => {
             let ar = regs[argName].exec(this.argString);
             if (ar === null) {
@@ -197,7 +198,7 @@ class Command {
                         case 'api_recent_passed': return this.getApiRecentInfo(arg, false, true);
                         case 'api_recent_passed_rx': return this.getApiRecentInfo(arg, true, true);
                         case 'bot_bind': return this.getBotBindInfo(arg, nedb);
-                        case 'bot_unbind': return this.getBotUnbindInfo(nedb);
+                        case 'bot_unbind': return this.getBotUnbindInfo(arg, nedb);
                         case 'bot_setmode': return this.getBotSetmodeInfo(arg, nedb);
                         default: return "当你看到这条信息说明指令处理代码有bug惹";
                     }
@@ -242,8 +243,15 @@ class Command {
         return await new UserInfo(this.host).bindUser(nedb, this.meta.userId, apiObjects[0]);
     }
 
-    async getBotUnbindInfo(nedb) {
-        return await new UserInfo(this.host).unbindUser(nedb, this.meta.userId);
+    async getBotUnbindInfo(arg, nedb) {
+        // 只允许管理员unbind
+        if (this.admin.indexOf(this.meta.userId) < 0) {
+            return "只有管理员才能进行解绑操作";
+        }
+        let user = arg.getOsuApiObject()[0].u;
+        let qqId = parseInt(user);
+        if (!qqId) return "请输入需要解绑的QQ号";
+        return await new UserInfo(this.host).unbindUser(nedb, qqId);
     }
 
     async getBotSetmodeInfo(arg, nedb) {
