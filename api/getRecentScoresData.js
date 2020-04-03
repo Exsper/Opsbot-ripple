@@ -18,7 +18,7 @@ class getRecentScoresData {
         if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
         if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) return "找不到成绩 " + JSON.stringify(this.apiObject) + "\n";
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(this.apiObject) + "\n";
         let scoreObjects = scores.map(item => { return new ScoreObject(item, null, simpleUserObject); });
         return scoreObjects;
     }
