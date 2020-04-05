@@ -66,8 +66,7 @@ class getBestScoresData {
                 let scoreObjects = await this.getBestScoresObject(simpleUserObject);
                 let limit = parseInt(this.apiObject.limit);
                 if (limit > scoreObjects.length || limit <= 0) {
-                    if (limit <= 0) return "Ай-ай-ай-ай-ай, что сейчас произошло!";
-                    if (limit > 999) return "您要找史前数据吗？";
+                    if (limit <= 0 || limit > 999) return "Ай-ай-ай-ай-ай, что сейчас произошло!";
                     if (limit > 100) return "人家也想看100以外的bp，QAQ";
                     return "超出bp范围，该玩家bp长度为 " + scoreObjects.length;
                 }
