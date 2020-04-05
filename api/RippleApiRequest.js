@@ -178,6 +178,7 @@ class RippleApi {
         if (options.b) data.b = options.b;
         if (options.limit) data.l = options.limit;
         if (options.m || options.m === 0) data.mode = options.m;
+        data.sort = "score,desc" // 按得分降序排列
         const resp = await this.apiCall('/scores', data, host);
         return resp;
     }
