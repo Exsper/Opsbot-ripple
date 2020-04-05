@@ -30,13 +30,47 @@ class getBestScoresData {
         return await new getUserData(this.host, userArgObject, null).getSimpleUserObject();
     }
 
+    async outputToday() {
+        try {
+            let today = new Date().getTime();
+            let simpleUserObject = await this.getSimpleUserObject();
+            // bp列表
+            let output = "";
+            let scoreObjects = await this.getBestScoresObject(simpleUserObject);
+            let todayScoreObjects = scoreObjects.filter((scoreObject) => {
+                return (today - scoreObject.getPlayedDate().getTime() < 24 * 3600 * 1000)  
+            });
+            if (todayScoreObjects.length <= 0) return "您今天还没刷新bp呢（你气不气.wav）";
+            let isOver15 = false;
+            if (todayScoreObjects.length > 15) {
+                isOver15 = true;
+                todayScoreObjects = todayScoreObjects.slice(0, 15);
+            }
+            todayScoreObjects.map((scoreObject) => {
+                output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);
+                output = output + scoreObject.toString() + "\n";
+            });
+            if (isOver15) output = output + "为防止文字过长，已省略其他bp……"
+            return output;
+        }
+        catch (ex) {
+            return ex;
+        }
+    }
+
     async output() {
         try {
             let simpleUserObject = await this.getSimpleUserObject();
             if (this.apiObject.limit) {
                 // 指定bp
                 let scoreObjects = await this.getBestScoresObject(simpleUserObject);
-                if (parseInt(this.apiObject.limit) > scoreObjects.length) return "超出bp范围，该玩家bp长度为 " + scoreObjects.length;
+                let limit = parseInt(this.apiObject.limit);
+                if (limit > scoreObjects.length || limit <= 0) {
+                    if (limit <= 0) return "Ай-ай-ай-ай-ай, что сейчас произошло!";
+                    if (limit > 999) return "您要找史前数据吗？";
+                    if (limit > 100) return "人家也想看100以外的bp，QAQ";
+                    return "超出bp范围，该玩家bp长度为 " + scoreObjects.length;
+                }
                 let scoreObject = scoreObjects.pop();
                 let output = "";
                 output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);

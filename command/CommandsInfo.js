@@ -126,6 +126,20 @@ function CommandsInfo(prefix, prefix2) {
             args: ['userStringWithoutBeatmap', 'limitString', 'modeString'],
             argNecessity: [1, -1, 0],
         }, {
+            type: 'api_todaybp',
+            info: '今日bp列表查询',
+            command: ['todaybp'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [1, 0],
+        }, {
+            type: 'api_todaybp_rx',
+            info: '今日bp列表查询（relax模式）',
+            command: ['todaybprx'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [1, 0],
+        }, {
             type: 'api_recent',
             info: '获取最近成绩（包括未pass成绩）',
             command: ['r', 'rct', 'rctpp', 'recent'],

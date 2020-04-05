@@ -13,6 +13,8 @@ class ScoreObject {
         if (score.user) this.user = new SimpleUserObject(score.user)
         else this.user = user;
 
+        this.time = score.time; // 字符串格式，YYYY-MM-DDTHH:MM:SSZ
+
         this.score = score.score;
         this.maxcombo = score.max_combo;
         this.count50 = score.count_50;
@@ -31,6 +33,10 @@ class ScoreObject {
 
         this.acc = score.accuracy;
         this.mode = score.play_mode;
+    }
+
+    getPlayedDate() {
+        return new Date(this.time);
     }
 
     toString() {

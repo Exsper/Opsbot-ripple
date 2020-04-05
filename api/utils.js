@@ -1,6 +1,6 @@
 class utils {
     // 获取格式化游玩时长
-    static getUserTimePlayed(play_time) {
+    static getUserTimePlayed(play_time) { // play_time为秒数
         const s = parseInt(play_time);
         if (s <= 0) return "从来没玩过";
         const day = Math.floor(s / (24 * 3600)); // Math.floor()向下取整 
@@ -169,6 +169,24 @@ class utils {
         return min + ":" + sec;
     }
 
+    /**
+     * 对比时间
+     * @param {Date} startTime 
+     * @param {Date} endTime 
+     * @returns {String}
+     */
+    static getCompareInterval(startTime, endTime) {
+        const interval = endTime.getTime() - startTime.getTime();
+        if (interval <= 0) return "无对比数据";
+        const day = Math.floor(interval / (24 * 3600 * 1000));
+        if (day > 0) return day + " 天前";
+        const hour = Math.floor(interval / (3600 * 1000));
+        if (hour > 0) return hour + " 小时前";
+        const minute = Math.floor(interval / (60 * 1000));
+        if (minute > 0) return minute + " 分钟前";
+        return "1 分钟前";
+    }
+    
 }
 
 

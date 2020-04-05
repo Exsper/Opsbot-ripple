@@ -48,7 +48,8 @@ class UserObject {
         output = output + "id：" + this.userId + "\n";
         output = output + this.modeStats[parseInt(mode)].compareTo(oldUserObject.modeStats[parseInt(mode)]);
         output = output + "\n";
-        output = output + "对比：" + oldUserObject.recordDate.toLocaleString();
+        //output = output + "对比：" + oldUserObject.recordDate.toLocaleString();
+        output = output + "对比：" + utils.getCompareInterval(oldUserObject.recordDate, this.recordDate);
         return output;
     }
 

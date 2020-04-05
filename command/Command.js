@@ -135,14 +135,15 @@ class Command {
             output = output + prefix + "mode 设置默认模式\n";
             output = output + prefix + "stat/statrx 查状态\n";
             output = output + prefix + "bp/bprx 查bp\n";
-            output = output + prefix + "me 查自己成绩\n";
-            output = output + prefix + "pr/recent 查最近成绩\n";
-            output = output + prefix + "prrx/recentrx 查最近relax成绩\n";
-            output = output + prefix + "score 查成绩\n";
-            output = output + prefix + "top/vstop 查#1成绩\n";
+            output = output + prefix + "todaybp/todaybprx 查今日bp\n";
+            output = output + prefix + "me 查自己成绩（仅限classic）\n";
+            output = output + prefix + "pr/prrx 查最近pass成绩\n";
+            output = output + prefix + "recent/recentrx 查最近成绩（包括未完成）\n";
+            output = output + prefix + "score 查成绩（仅限classic）\n";
+            output = output + prefix + "top/vstop 查#1成绩（仅限classic）\n";
             output = output + "\n";
-            output = output + prefix + "score查成绩时谱面名和玩家名之间要用|分隔\n";
-            output = output + prefix + "score查成绩时玩家名用/分割可以同时查询多玩家的成绩\n";
+            // output = output + prefix + "score查成绩时谱面名和玩家名之间要用|分隔\n";
+            // output = output + prefix + "score查成绩时玩家名用/分割可以同时查询多玩家的成绩\n";
             output = output + prefix + "help + 指令 可以查询该指令详细信息\n";
             // output = output + "基本指令有：" + commands.reduce((acc, cur) => { return acc + cur.command[0] + "/" }, "");
             return output;
@@ -193,6 +194,8 @@ class Command {
                         // case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true);
                         case 'api_bp': return this.getApiBpInfo(arg, false);
                         case 'api_bp_rx': return this.getApiBpInfo(arg, true);
+                        case 'api_todaybp': return this.getApiTodayBpInfo(arg, false);
+                        case 'api_todaybp_rx': return this.getApiTodayBpInfo(arg, true);
                         case 'api_recent': return this.getApiRecentInfo(arg, false, false);
                         case 'api_recent_rx': return this.getApiRecentInfo(arg, true, false);
                         case 'api_recent_passed': return this.getApiRecentInfo(arg, false, true);
@@ -231,6 +234,11 @@ class Command {
     async getApiBpInfo(arg, isRX) {
         let apiObjects = arg.getOsuApiObject();
         return await new getBestScoresData(this.host, apiObjects, isRX).output();
+    }
+
+    async getApiTodayBpInfo(arg, isRX) {
+        let apiObjects = arg.getOsuApiObject();
+        return await new getBestScoresData(this.host, apiObjects, isRX).outputToday();
     }
 
     async getApiRecentInfo(arg, isRX, isPassed) {
