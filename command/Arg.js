@@ -31,7 +31,8 @@ class Arg {
     constructor(args) {
         this.beatmapId = -1;
         this.beatmapSearchInfo = {};
-        if (args.beatmapString) this.getBeatmapInfo(args.beatmapString);
+        if (args.beatmapStringWithUser) this.getBeatmapInfo(args.beatmapStringWithUser);
+        if (args.beatmapStringWithoutUser) this.getBeatmapInfo(args.beatmapStringWithoutUser);
         if (args.userStringWithBeatmap) this.users = this.getUsers(args.userStringWithBeatmap);
         if (args.userStringWithoutBeatmap) this.users = this.getUsers(args.userStringWithoutBeatmap);
         if (args.modsString) this.mods = this.getEnabledModsValue(args.modsString);

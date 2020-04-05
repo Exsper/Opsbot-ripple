@@ -43,22 +43,26 @@ class getScoreData {
      */
     searchUsersScore(scoreObjects, userIds) {
         let searchResult = [];
+        // 全部统一成小写字母形式
+        let userIdNames = userIds.map((userId) => {
+            return userId.toString().toLowerCase();
+        });
         for (var i = 0; i < scoreObjects.length; i++) {
             let thisScoreUserId = scoreObjects[i].user.userId.toString();
-            let thisScoreUserName = scoreObjects[i].user.username;
-            let findIndex = userIds.indexOf(thisScoreUserId);
-            let findIndex2 = userIds.indexOf(thisScoreUserName);
+            let thisScoreUserName = scoreObjects[i].user.username.toLocaleLowerCase();
+            let findIndex = userIdNames.indexOf(thisScoreUserId);
+            let findIndex2 = userIdNames.indexOf(thisScoreUserName);
             if (findIndex >= 0) {
                 searchResult.push(scoreObjects[i]);
-                userIds.splice(findIndex, 1);
-                if (findIndex2 >= 0) userIds.splice(findIndex2, 1); // 防userIds重复
+                userIdNames.splice(findIndex, 1);
+                if (findIndex2 >= 0) userIdNames.splice(findIndex2, 1); // 防userIds重复
             }
             else if (findIndex2 >= 0) {
                 searchResult.push(scoreObjects[i]);
-                if (findIndex >= 0) userIds.splice(findIndex, 1); // 防userIds重复
-                userIds.splice(findIndex2, 1);
+                if (findIndex >= 0) userIdNames.splice(findIndex, 1); // 防userIds重复
+                userIdNames.splice(findIndex2, 1);
             }
-            if (userIds.length <= 0) break;
+            if (userIdNames.length <= 0) break;
         }
         return searchResult;
     }
