@@ -74,12 +74,18 @@ class RippleApi {
         else { data.name = u; return data; }
     }
 
+    /**
+     * ping
+     * @param {String} host 
+     */
     static async getPing(host) {
         const resp = await this.apiCall('/ping', null, host);
         return resp;
     }
 
 	/**
+     * 获取user简略信息
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -90,6 +96,8 @@ class RippleApi {
     }
 
 	/**
+     * 获取user详细信息
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -100,6 +108,8 @@ class RippleApi {
     }
 
 	/**
+     * 获取user relax详细信息
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -110,6 +120,8 @@ class RippleApi {
     }
 
 	/**
+     * 根据username获取userId
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -120,6 +132,8 @@ class RippleApi {
     }
 
 	/**
+     * 获取user recent
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -132,6 +146,8 @@ class RippleApi {
     }
 
 	/**
+     * 获取user relax recent
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -144,6 +160,8 @@ class RippleApi {
     }
 
 	/**
+     * 获取user best（100个/页），查找指定bp：&l=1&p=#number
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -151,11 +169,28 @@ class RippleApi {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m || options.m === 0) data.mode = options.m;
+        if (options.p) data.p = options.p;
         const resp = await this.apiCall('/users/scores/best', data, host);
         return resp;
     }
 
 	/**
+     * 获取user 全部 best
+     * @param {String} host 
+	 * @param {Object} options apiOptions格式（osu api参数格式）
+	 * @returns {Promise<Object>} The response body
+	 */
+    static async getBestsAll(options, host) {
+        let data = this.setIdOrName(options);
+        // limit失效
+        if (options.m || options.m === 0) data.mode = options.m;
+        const resp = await this.apiCall('/users/scores/bestall', data, host);
+        return resp;
+    }
+
+	/**
+     * 获取user relax best，查找指定bp：&l=1&p=#number
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */
@@ -163,12 +198,28 @@ class RippleApi {
         let data = this.setIdOrName(options);
         if (options.limit) data.l = options.limit;
         if (options.m || options.m === 0) data.mode = options.m;
+        if (options.p) data.p = options.p;
         const resp = await this.apiCall('/users/scores/rxbest', data, host);
         return resp;
     }
 
 	/**
-     * 暂不支持查relax成绩！！
+     * 获取user 全部 relax best
+     * @param {String} host 
+	 * @param {Object} options apiOptions格式（osu api参数格式）
+	 * @returns {Promise<Object>} The response body
+	 */
+    static async getBestsRxAll(options, host) {
+        let data = this.setIdOrName(options);
+        // limit失效
+        if (options.m || options.m === 0) data.mode = options.m;
+        const resp = await this.apiCall('/users/scores/rxbestall', data, host);
+        return resp;
+    }
+
+	/**
+     * 根据谱面获取成绩 暂不支持查relax成绩！！
+     * @param {String} host 
 	 * @param {Object} options apiOptions格式（osu api参数格式）
 	 * @returns {Promise<Object>} The response body
 	 */

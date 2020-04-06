@@ -99,7 +99,13 @@ class Command {
         // 先去获取数据库
         await this.getUserInfo(nedb);
         // me指令没有userId参数，默认是绑定账号，只为了兼容白菜指令，不要它代码会更简洁一点
-        if (commandInfo.type === "api_score_me" || commandInfo.type === "api_score_me_rx" || commandInfo.type === "api_score_vstop" || commandInfo.type === "bot_setmode") args.userStringWithoutBeatmap = this.userInfo.osuId;
+        if ( commandInfo.type === "api_score_me" ||
+            // commandInfo.type === "api_score_me_rx" ||
+            commandInfo.type === "api_score_vstop" ||
+            commandInfo.type === "bot_setmode" ||
+            commandInfo.type === "api_nbp" ||
+            commandInfo.type === "api_nbp_rx"
+        ) args.userStringWithoutBeatmap = this.userInfo.osuId;
         argsName.map((argName, index) => {
             let ar = regs[argName].exec(this.argString);
             if (ar === null) {
@@ -135,6 +141,7 @@ class Command {
             output = output + prefix + "mode 设置默认模式\n";
             output = output + prefix + "stat/statrx 查状态\n";
             output = output + prefix + "bp/bprx 查bp\n";
+            output = output + prefix + "nbp/nbprx 查谱面在bp位置\n";
             output = output + prefix + "todaybp/todaybprx 查今日bp\n";
             output = output + prefix + "me 查自己成绩（仅限classic）\n";
             output = output + prefix + "pr/prrx 查最近pass成绩\n";
@@ -194,6 +201,8 @@ class Command {
                         // case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true);
                         case 'api_bp': return this.getApiBpInfo(arg, false);
                         case 'api_bp_rx': return this.getApiBpInfo(arg, true);
+                        case 'api_nbp': return this.getApiBpNumberInfo(arg, false);
+                        case 'api_nbp_rx': return this.getApiBpNumberInfo(arg, true);
                         case 'api_todaybp': return this.getApiTodayBpInfo(arg, false);
                         case 'api_todaybp_rx': return this.getApiTodayBpInfo(arg, true);
                         case 'api_recent': return this.getApiRecentInfo(arg, false, false);
@@ -239,6 +248,12 @@ class Command {
     async getApiTodayBpInfo(arg, isRX) {
         let apiObjects = arg.getOsuApiObject();
         return await new getBestScoresData(this.host, apiObjects, isRX).outputToday();
+    }
+
+    async getApiBpNumberInfo(arg, isRX) {
+        let arg2 = await arg.getBeatmapId();
+        let apiObjects = arg2.getOsuApiObject();
+        return await new getBestScoresData(this.host, apiObjects, isRX).outputBpNumber();
     }
 
     async getApiRecentInfo(arg, isRX, isPassed) {

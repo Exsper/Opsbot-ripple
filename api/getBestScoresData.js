@@ -63,14 +63,10 @@ class getBestScoresData {
             let simpleUserObject = await this.getSimpleUserObject();
             if (this.apiObject.limit) {
                 // 指定bp
+                this.apiObject.p = this.apiObject.limit;
+                this.apiObject.limit = 1;
                 let scoreObjects = await this.getBestScoresObject(simpleUserObject);
-                let limit = parseInt(this.apiObject.limit);
-                if (limit > scoreObjects.length || limit <= 0) {
-                    if (limit <= 0 || limit > 999) return "Ай-ай-ай-ай-ай, что сейчас произошло!";
-                    if (limit > 100) return "人家也想看100以外的bp，QAQ";
-                    return "超出bp范围，该玩家bp长度为 " + scoreObjects.length;
-                }
-                let scoreObject = scoreObjects.pop();
+                let scoreObject = scoreObjects[0];
                 let output = "";
                 output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);
                 output = output + scoreObject.toCompleteString();
@@ -87,6 +83,40 @@ class getBestScoresData {
                 });
                 return output;
             }
+        }
+        catch (ex) {
+            return ex;
+        }
+    }
+
+    async getAllBestScoresObject(simpleUserObject) {
+        const result = (this.isRX) ? await RippleApi.getBestsRxAll(this.apiObject, this.host) : await RippleApi.getBestsAll(this.apiObject, this.host);
+        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
+        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);
+        let scores = result.scores;
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        let scoreObjects = scores.map(item => { return new ScoreObject(item, null, simpleUserObject); });
+        return scoreObjects;
+    }
+
+    async outputBpNumber() {
+        try {
+            let simpleUserObject = await this.getSimpleUserObject();
+            // bp列表
+            let output = "";
+            let scoreObjects = await this.getAllBestScoresObject(simpleUserObject);
+            let length = scoreObjects.length;
+            let beatmapId = this.apiObject.b;
+            for (let i = 0; i < length; i++) {
+                if (beatmapId === scoreObjects[i].beatmap.beatmapId) {
+                    output = output + scoreObjects[i].beatmap.toScoreTitle(scoreObjects[i].mode);
+                    output = output + scoreObjects[i].toCompleteString();
+                    output = output + "\n该谱面是您的bp " + (i + 1).toString();
+                    return output;
+                }
+            }
+            return "在您的bp列表里找不到该谱面。"
         }
         catch (ex) {
             return ex;

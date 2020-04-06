@@ -127,6 +127,20 @@ function CommandsInfo(prefix, prefix2) {
             args: ['userStringWithoutBeatmap', 'limitString', 'modeString'],
             argNecessity: [1, -1, 0],
         }, {
+            type: 'api_nbp',
+            info: '查询谱面在自己bp中的位置',
+            command: ['nbp'],
+            argsInfo: '[beatmap] (:mode)',
+            args: ['beatmapStringWithoutUser', 'modeString'],
+            argNecessity: [2, 0]
+        }, {
+            type: 'api_nbp_rx',
+            info: '查询谱面在自己bp中的位置（relax模式）',
+            command: ['nbprx'],
+            argsInfo: '[beatmap] (:mode)',
+            args: ['beatmapStringWithoutUser', 'modeString'],
+            argNecessity: [2, 0]
+        }, {
             type: 'api_todaybp',
             info: '今日bp列表查询',
             command: ['todaybp'],
