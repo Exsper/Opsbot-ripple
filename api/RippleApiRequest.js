@@ -127,7 +127,7 @@ class RippleApi {
 	 */
     static async getUserId(options, host) {
         let data = { name: options.u };
-        const resp = await this.apiCall('/whatid', data, host);
+        const resp = await this.apiCall('/users/whatid', data, host);
         return resp;
     }
 
