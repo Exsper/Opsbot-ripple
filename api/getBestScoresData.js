@@ -116,7 +116,9 @@ class getBestScoresData {
                     return output;
                 }
             }
-            return "在您的bp列表里找不到该谱面。"
+            output = output + "谱面id: "+ this.apiObject.b + "\n";
+            output = output + "在您的bp列表里找不到该谱面。";
+            return output;
         }
         catch (ex) {
             return ex;

@@ -99,7 +99,7 @@ class Command {
         // 先去获取数据库
         await this.getUserInfo(nedb);
         // me指令没有userId参数，默认是绑定账号，只为了兼容白菜指令，不要它代码会更简洁一点
-        if ( commandInfo.type === "api_score_me" ||
+        if (commandInfo.type === "api_score_me" ||
             // commandInfo.type === "api_score_me_rx" ||
             commandInfo.type === "api_score_vstop" ||
             commandInfo.type === "bot_setmode" ||
@@ -224,9 +224,14 @@ class Command {
     }
 
     async getApiBeatmapInfo(arg) {
-        let arg2 = await arg.getBeatmapId();
-        let apiObjects = arg2.getOsuApiObject();
-        return await new getBeatmapData(this.host, apiObjects).output();
+        try {
+            let arg2 = await arg.getBeatmapId();
+            let apiObjects = arg2.getOsuApiObject();
+            return await new getBeatmapData(this.host, apiObjects).output();
+        }
+        catch (ex) {
+            return ex;
+        }
     }
 
     async getApiUserInfo(arg, isRX, nedb) {
@@ -235,9 +240,14 @@ class Command {
     }
 
     async getApiScoreInfo(arg, isRX, isTop, isVsTop) {
-        let arg2 = await arg.getBeatmapId();
-        let apiObjects = arg2.getOsuApiObject();
-        return await new getScoreData(this.host, apiObjects, isRX, isTop, isVsTop).output();
+        try {
+            let arg2 = await arg.getBeatmapId();
+            let apiObjects = arg2.getOsuApiObject();
+            return await new getScoreData(this.host, apiObjects, isRX, isTop, isVsTop).output();
+        }
+        catch (ex) {
+            return ex;
+        }
     }
 
     async getApiBpInfo(arg, isRX) {
@@ -251,9 +261,14 @@ class Command {
     }
 
     async getApiBpNumberInfo(arg, isRX) {
-        let arg2 = await arg.getBeatmapId();
-        let apiObjects = arg2.getOsuApiObject();
-        return await new getBestScoresData(this.host, apiObjects, isRX).outputBpNumber();
+        try {
+            let arg2 = await arg.getBeatmapId();
+            let apiObjects = arg2.getOsuApiObject();
+            return await new getBestScoresData(this.host, apiObjects, isRX).outputBpNumber();
+        }
+        catch (ex) {
+            return ex;
+        }
     }
 
     async getApiRecentInfo(arg, isRX, isPassed) {

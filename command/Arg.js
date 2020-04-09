@@ -62,20 +62,20 @@ class Arg {
             // 先取mapper，因为mapper名字里可能有-[]
             let mapperStart = s.lastIndexOf("(");
             let mapperEnd = s.lastIndexOf(")");
-            if (mapperStart > 0 && mapperEnd > 0 && mapperEnd - mapperStart > 1) {
+            if (mapperStart >= 0 && mapperEnd >= 0 && mapperEnd - mapperStart > 1) {
                 this.beatmapSearchInfo.mapper = s.substring(mapperStart + 1, mapperEnd).trim();
                 s = s.substring(0, mapperStart) + s.substring(mapperEnd + 1);
             }
             // 取artist
             let artistEnd = s.indexOf("-");
-            if (artistEnd > 0) {
+            if (artistEnd >= 0) {
                 this.beatmapSearchInfo.artist = s.substring(0, artistEnd).trim();
                 s = s.substring(artistEnd + 1)
             }
             // 取diff_name
             let diffStart = s.lastIndexOf("[");
             let diffEnd = s.lastIndexOf("]");
-            if (diffStart > 0 && diffEnd > 0 && diffEnd - diffStart > 1) {
+            if (diffStart >= 0 && diffEnd >= 0 && diffEnd - diffStart > 1) {
                 this.beatmapSearchInfo.diff_name = s.substring(diffStart + 1, diffEnd).trim();
                 s = s.substring(0, diffStart) + s.substring(diffEnd + 1);
             }
