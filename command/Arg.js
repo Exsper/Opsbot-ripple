@@ -10,6 +10,7 @@ const OsusearchApi = require("../api/OsusearchApiRequest");
  * @property {String} beatmapSearchInfo.title 
  * @property {String} beatmapSearchInfo.mapper 
  * @property {String} beatmapSearchInfo.diff_name 
+ * @property {String} beatmapSearchString
  * @property {Array<String>} users 玩家名Array，未指定玩家则length=0
  * @property {0|1|2|3} mode 模式
  * @property {Number} mods modsValue
@@ -31,8 +32,14 @@ class Arg {
     constructor(args) {
         this.beatmapId = -1;
         this.beatmapSearchInfo = {};
-        if (args.beatmapStringWithUser) this.getBeatmapInfo(args.beatmapStringWithUser);
-        if (args.beatmapStringWithoutUser) this.getBeatmapInfo(args.beatmapStringWithoutUser);
+        if (args.beatmapStringWithUser){
+            this.beatmapSearchString = args.beatmapStringWithUser;
+            this.getBeatmapInfo(args.beatmapStringWithUser);
+        }
+        if (args.beatmapStringWithoutUser) {
+            this.beatmapSearchString = args.beatmapStringWithoutUser;
+            this.getBeatmapInfo(args.beatmapStringWithoutUser);
+        }
         if (args.userStringWithBeatmap) this.users = this.getUsers(args.userStringWithBeatmap);
         if (args.userStringWithoutBeatmap) this.users = this.getUsers(args.userStringWithoutBeatmap);
         if (args.modsString) this.mods = this.getEnabledModsValue(args.modsString);

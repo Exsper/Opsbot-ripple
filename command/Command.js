@@ -264,7 +264,7 @@ class Command {
         try {
             let arg2 = await arg.getBeatmapId();
             let apiObjects = arg2.getOsuApiObject();
-            return await new getBestScoresData(this.host, apiObjects, isRX).outputBpNumber();
+            return await new getBestScoresData(this.host, apiObjects, isRX, arg.beatmapSearchString).outputBpNumber();
         }
         catch (ex) {
             return ex;

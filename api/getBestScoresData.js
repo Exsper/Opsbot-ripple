@@ -5,10 +5,11 @@ const RippleApi = require("./RippleApiRequest");
 const getUserData = require("./getUserData");
 
 class getBestScoresData {
-    constructor(host, apiObjects, isRX) {
+    constructor(host, apiObjects, isRX, searchText = "") {
         this.host = host;
         this.apiObject = (Array.isArray(apiObjects)) ? apiObjects[0] : apiObjects; // 只允许查一个人
         this.isRX = isRX;
+        this.searchText = searchText;
     }
 
     async getBestScoresObject(simpleUserObject) {
@@ -38,7 +39,7 @@ class getBestScoresData {
             let output = "";
             let scoreObjects = await this.getBestScoresObject(simpleUserObject);
             let todayScoreObjects = scoreObjects.filter((scoreObject) => {
-                return (today - scoreObject.getPlayedDate().getTime() < 24 * 3600 * 1000)  
+                return (today - scoreObject.getPlayedDate().getTime() < 24 * 3600 * 1000)
             });
             if (todayScoreObjects.length <= 0) return "您今天还没刷新bp呢（你气不气.wav）";
             let isOver15 = false;
@@ -116,7 +117,19 @@ class getBestScoresData {
                     return output;
                 }
             }
-            output = output + "谱面id: "+ this.apiObject.b + "\n";
+            // bp中找不到谱面，搜索searchText
+            if (this.searchText) {
+                for (let i = 0; i < length; i++) {
+                    if (scoreObjects[i].beatmap.songName.toLowerCase().indexOf(this.searchText.toLowerCase()) >= 0) {
+                        output = output + scoreObjects[i].beatmap.toScoreTitle(scoreObjects[i].mode);
+                        output = output + scoreObjects[i].toCompleteString();
+                        output = output + "\n该谱面是您的bp " + (i + 1).toString();
+                        return output;
+                    }
+                }
+            }
+            // bp中也没有
+            output = output + "谱面id: " + this.apiObject.b + "\n";
             output = output + "在您的bp列表里找不到该谱面。";
             return output;
         }
