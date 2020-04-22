@@ -141,6 +141,20 @@ function CommandsInfo(prefix, prefix2) {
             args: ['beatmapStringWithoutUser', 'modeString'],
             argNecessity: [2, 0]
         }, {
+            type: 'api_ranknumber',
+            info: '查询成绩统计数量',
+            command: ['rn'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [1, 0]
+        }, {
+            type: 'api_ranknumber_rx',
+            info: '查询成绩统计数量（relax模式）',
+            command: ['rnrx', 'rxrn'],
+            argsInfo: '(user) (:mode)',
+            args: ['userStringWithoutBeatmap', 'modeString'],
+            argNecessity: [1, 0]
+        }, {
             type: 'api_todaybp',
             info: '今日bp列表查询',
             command: ['todaybp'],

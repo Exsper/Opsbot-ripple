@@ -203,6 +203,8 @@ class Command {
                         case 'api_bp_rx': return this.getApiBpInfo(arg, true);
                         case 'api_nbp': return this.getApiBpNumberInfo(arg, false);
                         case 'api_nbp_rx': return this.getApiBpNumberInfo(arg, true);
+                        case 'api_ranknumber': return this.getApiRankNumber(arg, false);
+                        case 'api_ranknumber_rx': return this.getApiRankNumber(arg, true);
                         case 'api_todaybp': return this.getApiTodayBpInfo(arg, false);
                         case 'api_todaybp_rx': return this.getApiTodayBpInfo(arg, true);
                         case 'api_recent': return this.getApiRecentInfo(arg, false, false);
@@ -253,6 +255,11 @@ class Command {
     async getApiBpInfo(arg, isRX) {
         let apiObjects = arg.getOsuApiObject();
         return await new getBestScoresData(this.host, apiObjects, isRX).output();
+    }
+
+    async getApiRankNumber(arg, isRX) {
+        let apiObjects = arg.getOsuApiObject();
+        return await new getBestScoresData(this.host, apiObjects, isRX).outputRankNumber();
     }
 
     async getApiTodayBpInfo(arg, isRX) {

@@ -51,7 +51,7 @@ class getBestScoresData {
                 output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);
                 output = output + scoreObject.toString() + "\n";
             });
-            if (isOver15) output = output + "为防止文字过长，已省略其他bp……"
+            if (isOver15) output = output + "为防止文字过长，已省略剩余的 "+(todayScoreObjects.length-15) + " 个bp";
             return output;
         }
         catch (ex) {
@@ -131,6 +131,36 @@ class getBestScoresData {
             // bp中也没有
             output = output + "谱面id: " + this.apiObject.b + "\n";
             output = output + "在您的bp列表里找不到该谱面。";
+            return output;
+        }
+        catch (ex) {
+            return ex;
+        }
+    }
+
+    async outputRankNumber() {
+        try {
+            let simpleUserObject = await this.getSimpleUserObject();
+            // bp列表
+            let output = simpleUserObject.username + " 的成绩统计：\n";
+            let scoreObjects = await this.getAllBestScoresObject(simpleUserObject);
+            let ranks = [];
+            let counts = [];
+            let length = scoreObjects.length;
+            for (let i = 0; i < length; i++) {
+                let rank = scoreObjects[i].rank;
+                let rankIndex = ranks.indexOf(rank);
+                if (rankIndex<0) {
+                    ranks.push(rank);
+                    counts.push(1);
+                }
+                else {
+                    counts[rankIndex] = counts[rankIndex]+1;
+                }
+            }
+            for (let i = 0; i < ranks.length; i++) {
+                output = output + counts[i] + " 个 "+ ranks[i] + "\n";
+            }
             return output;
         }
         catch (ex) {
