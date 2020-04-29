@@ -186,6 +186,21 @@ class utils {
         if (minute > 0) return minute + " 分钟前";
         return "1 分钟前";
     }
+
+    /**
+     * 易读化错误信息
+     * @param {Object} apiObject 
+     */
+    static apiObjectToString(apiObject) {
+        let output = "（";
+        if (apiObject.b) output = output + " 谱面Id：" + apiObject.b;
+        if (apiObject.u) output = output + " 玩家：" + apiObject.u;
+        if (apiObject.type) output = output + " 玩家名类型：" + apiObject.type;
+        if (apiObject.m) output = output + " 模式：" + this.getModeString(apiObject.m);
+        //if (apiObject.limit) output = output + "limit:" + apiObject.limit;
+        output = output + "）";
+        return output;
+    }
     
 }
 

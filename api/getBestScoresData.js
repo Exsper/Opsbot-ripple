@@ -3,6 +3,7 @@
 const ScoreObject = require("./objects/ScoreObject");
 const RippleApi = require("./RippleApiRequest");
 const getUserData = require("./getUserData");
+const utils = require("./utils");
 
 class getBestScoresData {
     constructor(host, apiObjects, isRX, searchText = "") {
@@ -14,11 +15,11 @@ class getBestScoresData {
 
     async getBestScoresObject(simpleUserObject) {
         const result = (this.isRX) ? await RippleApi.getBestsRx(this.apiObject, this.host) : await RippleApi.getBests(this.apiObject, this.host);
-        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
-        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);
+        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(this.apiObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         let scoreObjects = scores.map(item => { return new ScoreObject(item, null, simpleUserObject); });
         return scoreObjects;
     }
@@ -42,16 +43,16 @@ class getBestScoresData {
                 return (today - scoreObject.getPlayedDate().getTime() < 24 * 3600 * 1000)
             });
             if (todayScoreObjects.length <= 0) return "您今天还没刷新bp呢（你气不气.wav）";
-            let isOver15 = false;
+            let over15Count = 0;
             if (todayScoreObjects.length > 15) {
-                isOver15 = true;
+                over15Count = todayScoreObjects.length - 15;
                 todayScoreObjects = todayScoreObjects.slice(0, 15);
             }
             todayScoreObjects.map((scoreObject) => {
                 output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);
                 output = output + scoreObject.toString() + "\n";
             });
-            if (isOver15) output = output + "为防止文字过长，已省略剩余的 "+(todayScoreObjects.length-15) + " 个bp";
+            if (over15Count > 0) output = output + "为防止文字过长，已省略剩余的 "+ over15Count + " 个bp";
             return output;
         }
         catch (ex) {
@@ -92,11 +93,11 @@ class getBestScoresData {
 
     async getAllBestScoresObject(simpleUserObject) {
         const result = (this.isRX) ? await RippleApi.getBestsRxAll(this.apiObject, this.host) : await RippleApi.getBestsAll(this.apiObject, this.host);
-        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
-        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);
+        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(this.apiObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         let scoreObjects = scores.map(item => { return new ScoreObject(item, null, simpleUserObject); });
         return scoreObjects;
     }

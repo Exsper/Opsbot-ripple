@@ -3,6 +3,7 @@
 const ScoreObject = require("./objects/ScoreObject");
 const RippleApi = require("./RippleApiRequest");
 const getUserData = require("./getUserData");
+const utils = require("./utils");
 
 class getRecentScoresData {
     constructor(host, apiObjects, isRX, isPassed) {
@@ -14,11 +15,11 @@ class getRecentScoresData {
 
     async getRecentScoresObject(simpleUserObject) {
         const result = (this.isRX) ? await RippleApi.getRecentRx(this.apiObject, this.host) : await RippleApi.getRecent(this.apiObject, this.host);
-        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(this.apiObject);
+        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         if (result.code === 400) throw "必须指定玩家名或Id（或先setid绑定私服账户）";
-        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(this.apiObject);
+        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(this.apiObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(this.apiObject) + "\n";
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject) + "\n";
         let scoreObjects = scores.map(item => { return new ScoreObject(item, null, simpleUserObject); });
         return scoreObjects;
     }

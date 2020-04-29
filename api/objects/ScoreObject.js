@@ -69,11 +69,12 @@ class ScoreObject {
             if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss ");
         }
         else if (this.mode === 2) {// catch
-            if (this.count300 > 0) counts.push(" " + this.count300 + "x 大果 ");
+            // 官方把drop翻译成水滴，把droplet翻译成小水滴，个人感觉怪怪的
+            if (this.count300 > 0) counts.push(" " + this.count300 + "x 水果 ");
             if (this.count100 > 0) counts.push(" " + this.count100 + "x 中果 ");
-            if (this.count50 > 0) counts.push(" " + this.count50 + "x 小果 ");
-            if (this.countkatu > 0) counts.push(" " + this.countkatu + "x miss小果 ");
-            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss大果 ");
+            if (this.count50 > 0) counts.push(" " + this.count50 + "x 果粒 ");
+            if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss水果 ");
+            if (this.countkatu > 0) counts.push(" " + this.countkatu + "x miss果粒 ");
         }
         else if (this.mode === 3) {// mania
             if (this.countgeki > 0) counts.push(" " + this.countgeki + "x 彩300 ");

@@ -2,6 +2,7 @@
 
 const BeatmapObject = require("./objects/BeatmapObject");
 const OsuApi = require("./ApiRequest");
+const utils = require("./utils");
 
 class getBeatmapData {
     constructor(host, apiObjects) {
@@ -11,9 +12,9 @@ class getBeatmapData {
 
     async getBeatmapObject() {
         const beatmaps = await OsuApi.getBeatmaps(this.apiObject, this.host);
-        if (beatmaps.code === 404) throw "找不到谱面 " + JSON.stringify(this.apiObject);
-        if (beatmaps.code === "error") throw "获取谱面出错 " + JSON.stringify(this.apiObject);
-        if (beatmaps.length <= 0) throw "找不到谱面 " + JSON.stringify(this.apiObject);
+        if (beatmaps.code === 404) throw "找不到谱面 " + utils.apiObjectToString(this.apiObject);
+        if (beatmaps.code === "error") throw "获取谱面出错 " + utils.apiObjectToString(this.apiObject);
+        if (beatmaps.length <= 0) throw "找不到谱面 " + utils.apiObjectToString(this.apiObject);
         return new BeatmapObject(beatmaps[0], false);
     }
 

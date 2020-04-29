@@ -3,6 +3,7 @@
 const ScoreObject = require("./objects/ScoreObject");
 const getBeatmapData = require("./getBeatmapData");
 const RippleApi = require("./RippleApiRequest");
+const utils = require("./utils");
 
 // 用ripple获取玩家成绩
 // api暂不能获取rx模式成绩！！
@@ -17,10 +18,10 @@ class getScoreData {
 
     async getScoreObjects(argObject, beatmapObject) {
         const result = await RippleApi.getScores(argObject, this.host);
-        if (result.code === 404) throw "找不到成绩 " + JSON.stringify(argObject);
-        if (result.code === "error") throw "获取成绩出错 " + JSON.stringify(argObject);
+        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
+        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(this.apiObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + JSON.stringify(argObject);
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
         let scoreObjects = scores.map(item => { return new ScoreObject(item, beatmapObject, null); });
         return scoreObjects;
     }
