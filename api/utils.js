@@ -190,6 +190,7 @@ class utils {
     /**
      * 易读化错误信息
      * @param {Object} apiObject 
+     * @returns {String}
      */
     static apiObjectToString(apiObject) {
         let output = "（";
@@ -197,8 +198,8 @@ class utils {
         if (apiObject.u) output = output + " 玩家：" + apiObject.u;
         if (apiObject.type) output = output + " 玩家名类型：" + apiObject.type;
         if (apiObject.m) output = output + " 模式：" + this.getModeString(apiObject.m);
-        //if (apiObject.limit) output = output + "limit:" + apiObject.limit;
-        output = output + "）";
+        if (apiObject.limit) output = output + " 索引：" + apiObject.limit;
+        output = output + " ）";
         return output;
     }
     

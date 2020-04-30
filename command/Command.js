@@ -192,13 +192,14 @@ class Command {
                         case 'api_user': return await this.getApiUserInfo(arg, false, nedb);
                         case 'api_user_rx': return await this.getApiUserInfo(arg, true, nedb);
                         case 'api_score':
-                        case 'api_score_me': return await this.getApiScoreInfo(arg, false, false, false);
+                        case 'api_score_me': return await this.getApiScoreInfo(arg, false, false, false, false);
                         // case 'api_score_rx':
-                        // case 'api_score_me_rx': return await this.getApiScoreInfo(arg, true, false, false);
-                        case 'api_score_top': return await this.getApiScoreInfo(arg, false, true, false);
-                        // case 'api_score_top_rx': return await this.getApiScoreInfo(arg, true, true, false);
-                        case 'api_score_vstop': return await this.getApiScoreInfo(arg, false, false, true);
-                        // case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true);
+                        // case 'api_score_me_rx': return await this.getApiScoreInfo(arg, true, false, false, false);
+                        case 'api_score_top': return await this.getApiScoreInfo(arg, false, true, false, false);
+                        // case 'api_score_top_rx': return await this.getApiScoreInfo(arg, true, true, false, false);
+                        case 'api_score_tops': return await this.getApiScoreInfo(arg, false, false, false, true);
+                        case 'api_score_vstop': return await this.getApiScoreInfo(arg, false, false, true, false);
+                        // case 'api_score_vstop_rx': return await this.getApiScoreInfo(arg, true, false, true, false);
                         case 'api_bp': return this.getApiBpInfo(arg, false);
                         case 'api_bp_rx': return this.getApiBpInfo(arg, true);
                         case 'api_nbp': return this.getApiBpNumberInfo(arg, false);
@@ -241,11 +242,11 @@ class Command {
         return await new getUserData(this.host, apiObjects, isRX).output(nedb);
     }
 
-    async getApiScoreInfo(arg, isRX, isTop, isVsTop) {
+    async getApiScoreInfo(arg, isRX, isTop, isVsTop, isTops) {
         try {
             let arg2 = await arg.getBeatmapId();
             let apiObjects = arg2.getOsuApiObject();
-            return await new getScoreData(this.host, apiObjects, isRX, isTop, isVsTop).output();
+            return await new getScoreData(this.host, apiObjects, isRX, isTop, isVsTop, isTops).output();
         }
         catch (ex) {
             return ex;

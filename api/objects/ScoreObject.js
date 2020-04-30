@@ -84,8 +84,9 @@ class ScoreObject {
             if (this.count50 > 0) counts.push(" " + this.count50 + "x 50 ");
             if (this.countmiss > 0) counts.push(" " + this.countmiss + "x miss ");
         }
+        const playDate = "日期：" + this.getPlayedDate().toLocaleDateString();
 
-        return name + comboString + accString + modsString + rankString + ppString + scoreString + counts.join("|");
+        return name + comboString + accString + modsString + rankString + ppString + scoreString + counts.join("|") + "\n" + playDate;
     }
 
 }

@@ -40,7 +40,7 @@ function CommandsInfo(prefix, prefix2) {
         }, {
             type: 'api_user_rx',
             info: '玩家查询（relax模式）',
-            command: ['statrx', 'rxstat', 'statmerx', 'statrxme', 'rxstatme','urx', 'userrx', 'prx', 'playerrx'],
+            command: ['statrx', 'rxstat', 'statmerx', 'statrxme', 'rxstatme', 'urx', 'userrx', 'prx', 'playerrx'],
             argsInfo: '(user) (:mode)',
             args: ['userStringWithoutBeatmap', 'modeString'],
             argNecessity: [1, 0]
@@ -54,13 +54,13 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap] (:mode)',
             args: ['beatmapStringWithoutUser', 'modeString'],
             argNecessity: [2, 0]
-        //}, {
-        //    type: 'api_score_me_rx',
-        //    info: '自己谱面成绩查询（relax模式）',
-        //    command: ['merx'],
-        //    argsInfo: '[beatmap] (+mods) (:mode)',
-        //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
-        //    argNecessity: [2, -1, 0],
+            //}, {
+            //    type: 'api_score_me_rx',
+            //    info: '自己谱面成绩查询（relax模式）',
+            //    command: ['merx'],
+            //    argsInfo: '[beatmap] (+mods) (:mode)',
+            //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
+            //    argNecessity: [2, -1, 0],
         }, {
             type: 'api_score',
             info: '指定玩家谱面成绩查询',
@@ -71,13 +71,13 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap] | [user] (:mode)',
             args: ['beatmapStringWithUser', 'userStringWithBeatmap', 'modeString'],
             argNecessity: [2, 2, 0]
-        //}, {
-        //    type: 'api_score_rx',
-        //    info: '指定玩家谱面成绩查询（relax模式）',
-        //    command: ['srx', 'scorerx'],
-        //    argsInfo: '[beatmap] | [user] (+mods) (:mode)',
-        //    args: ['beatmapStringWithUser', 'userStringWithBeatmap', 'modsString', 'modeString'],
-        //    argNecessity: [2, 2, -1, 0],
+            //}, {
+            //    type: 'api_score_rx',
+            //    info: '指定玩家谱面成绩查询（relax模式）',
+            //    command: ['srx', 'scorerx'],
+            //    argsInfo: '[beatmap] | [user] (+mods) (:mode)',
+            //    args: ['beatmapStringWithUser', 'userStringWithBeatmap', 'modsString', 'modeString'],
+            //    argNecessity: [2, 2, -1, 0],
         }, {
             type: 'api_score_top',
             info: '谱面最高成绩查询',
@@ -89,12 +89,22 @@ function CommandsInfo(prefix, prefix2) {
             args: ['beatmapStringWithoutUser', 'modeString'],
             argNecessity: [2, 0]
         //}, {
-        //    type: 'api_score_top_rx',
-        //    info: '谱面最高成绩查询（relax模式）',
-        //    command: ['trx', 'toprx'],
-        //    argsInfo: '[beatmap] (+mods) (:mode)',
-        //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
-        //    argNecessity: [2, -1, 0],
+            //    type: 'api_score_top_rx',
+            //    info: '谱面最高成绩查询（relax模式）',
+            //    command: ['trx', 'toprx'],
+            //    argsInfo: '[beatmap] (+mods) (:mode)',
+            //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
+            //    argNecessity: [2, -1, 0],
+        }, {
+            type: 'api_score_tops',
+            info: '谱面前10成绩查询',
+            command: ['ts', 'tops'],
+            // argsInfo: '[beatmap] (+mods) (:mode)',
+            // args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
+            // argNecessity: [2, -1, 0]
+            argsInfo: '[beatmap] (:mode)',
+            args: ['beatmapStringWithoutUser', 'modeString'],
+            argNecessity: [2, 0]
         }, {
             type: 'api_score_vstop',
             info: '谱面成绩与最高成绩比较',
@@ -105,13 +115,13 @@ function CommandsInfo(prefix, prefix2) {
             argsInfo: '[beatmap] (:mode)',
             args: ['beatmapStringWithoutUser', 'modeString'],
             argNecessity: [2, 0]
-        //}, {
-        //    type: 'api_score_vstop_rx',
-        //    info: '谱面成绩与最高成绩比较（relax模式）',
-        //    command: ['vstoprx', 'topvsrx'],
-        //    argsInfo: '[beatmap] (+mods) (:mode)',
-        //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
-        //    argNecessity: [2, -1, 0],
+            //}, {
+            //    type: 'api_score_vstop_rx',
+            //    info: '谱面成绩与最高成绩比较（relax模式）',
+            //    command: ['vstoprx', 'topvsrx'],
+            //    argsInfo: '[beatmap] (+mods) (:mode)',
+            //    args: ['beatmapStringWithoutUser', 'modsString', 'modeString'],
+            //    argNecessity: [2, -1, 0],
         }, {
             type: 'api_bp',
             info: 'bp成绩查询（省略#number则输出bp5）',

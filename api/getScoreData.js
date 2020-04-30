@@ -8,20 +8,21 @@ const utils = require("./utils");
 // 用ripple获取玩家成绩
 // api暂不能获取rx模式成绩！！
 class getScoreData {
-    constructor(host, apiObjects, isRX, isTop, isVsTop) {
+    constructor(host, apiObjects, isRX, isTop, isVsTop, isTops) {
         this.host = host;
         this.apiObjects = apiObjects;
         this.isRX = isRX;
         this.isTop = isTop;
         this.isVsTop = isVsTop;
+        this.isTops = isTops;
     }
 
     async getScoreObjects(argObject, beatmapObject) {
         const result = await RippleApi.getScores(argObject, this.host);
-        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
-        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(this.apiObject);
+        if (result.code === 404) throw "找不到成绩 " + utils.apiObjectToString(argObject);
+        if (result.code === "error") throw "获取成绩出错 " + utils.apiObjectToString(argObject);
         let scores = result.scores;
-        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(this.apiObject);
+        if ((!Array.isArray(scores)) || (scores.length <= 0)) throw "找不到成绩 " + utils.apiObjectToString(argObject);
         let scoreObjects = scores.map(item => { return new ScoreObject(item, beatmapObject, null); });
         return scoreObjects;
     }
@@ -85,9 +86,33 @@ class getScoreData {
         }
     }
 
+    async outputTopsScore() {
+        try {
+            let beatmapObject = await this.getBeatmapObject();
+            // limit = 10 取前10个成绩
+            let argObject = this.apiObjects[0];
+            argObject.limit = 10;
+            let scoreObjects = await this.getScoreObjects(argObject, beatmapObject);
+            if (scoreObjects.length <= 0) return "这个谱面还没有人上传过成绩";
+            let output = "";
+            output = output + beatmapObject.toScoreTitle(scoreObjects[0].mode);
+            if (scoreObjects.length === 1) output = output + scoreObjects[0].toCompleteString();
+            else {
+                scoreObjects.map((scoreObject) => {
+                    output = output + scoreObject.toString() + "\n";
+                });
+            }
+            return output;
+        }
+        catch (ex) {
+            return ex;
+        }
+    }
+
     async output() {
         try {
             if (this.isTop) return this.outputTopScore();
+            if (this.isTops) return this.outputTopsScore();
             let userIds = this.apiObjects.map((apiObject) => {
                 return apiObject.u;
             });
