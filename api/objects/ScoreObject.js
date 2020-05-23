@@ -4,6 +4,10 @@ const utils = require('../utils');
 const BeatmapObject = require('./BeatmapObject');
 const SimpleUserObject = require("./SimpleUserObject");
 
+// const SayobotSearchApi = require("../SayobotSearchApiRequest");
+const fetch = require('node-fetch')
+const ojsama = require("ojsama");
+
 class ScoreObject {
     // ripple api的/recent和/best有beatmap没有user，/score有user没有beatmap
     constructor(score, beatmap, user) {
@@ -87,6 +91,34 @@ class ScoreObject {
         const playDate = "日期：" + this.getPlayedDate().toLocaleDateString();
 
         return name + comboString + accString + modsString + rankString + ppString + scoreString + counts.join("|") + "\n" + playDate;
+    }
+
+    async getMap() {
+        const rawBeatmap = await fetch(`https://osu.ppy.sh/osu/${this.beatmap.beatmapId}`, { credentials: 'include' }).then(res => res.text());
+        const { map } = new ojsama.parser().feed(rawBeatmap);
+        return map;
+    }
+
+    async calculatePP() {
+        if (this.mode !== 0) return "";
+        // 这个功能需要从官网下载.osu谱面文件
+        try {
+            const map = await this.getMap();
+            const newstars = new ojsama.diff().calc({ map, mods: this.mods });
+
+            const pp = ojsama.ppv2({
+                stars: newstars,
+                combo: this.maxcombo,
+                nmiss: this.countmiss,
+                acc_percent: this.acc,
+            });
+            return "\n计算stars："+ newstars+"\n计算pp："+ pp;
+
+        }
+        catch (ex) {
+            console.log(ex);
+            return "";
+        }
     }
 
 }

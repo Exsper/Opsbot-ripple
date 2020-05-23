@@ -4,7 +4,9 @@
   "description": "koishi based qq-bot plugin for ripple based osu! server",
   "main": "index.js",
   "dependencies": {
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "node-fetch": "^2.6.0",
+    "ojsama": "^1.2.5"
   },
   "devDependencies": {
     "eslint": "^6.8.0"

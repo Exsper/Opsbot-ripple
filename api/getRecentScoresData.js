@@ -54,6 +54,7 @@ class getRecentScoresData {
                 let output = "";
                 output = output + scoreObject.beatmap.toScoreTitle(scoreObject.mode);
                 output = output + scoreObject.toCompleteString();
+                // output = output + await scoreObject.calculatePP();
                 return output;
             }
         }
